@@ -1,0 +1,522 @@
+@import "tailwindcss";
+
+/* ------------------------------------------------------------------ */
+/* Design tokens — CGuardPro Worker App                                */
+/* Tailwind v4 @theme: each --color-* generates utilities (bg-/text-)  */
+/* ------------------------------------------------------------------ */
+@theme {
+  /* ----------------------------------------------------------------- */
+  /* Every --color-* references a RUNTIME variable defined per theme in  */
+  /* theme/variables.css (:root = DARK default, html.theme-light = LIGHT).*/
+  /* So switching theme = toggling `.theme-light` on <html>; every        */
+  /* bg-*/
+  /* /text-* utility re-resolves automatically. Adding a 3rd theme = one  */
+  /* CSS block in variables.css. NEVER hardcode a color in a component.   */
+  /* ----------------------------------------------------------------- */
+
+  /* Surfaces / structure */
+  --color-background: var(--background);
+  --color-navy: var(--on-accent); /* legacy: text-navy = constant dark ON gold */
+  --color-navy-50: var(--surface-2); /* legacy bg-navy-50 inset → themed */
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+
+  /* Brand gold/amber (stays gold in both themes; tuned for contrast) */
+  --color-gold: var(--gold);
+  --color-gold-strong: var(--gold-strong);
+  --color-gold-hover: var(--gold-hover);
+  --color-gold-soft: var(--gold-soft);
+
+  /* Dark text shown ON gold (constant dark in both themes) */
+  --color-on-accent: var(--on-accent);
+
+  /* Text */
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
+
+  /* Status (meaning preserved across themes) */
+  --color-online: var(--online);
+  --color-online-soft: var(--online-soft);
+  --color-critical: var(--critical);
+  --color-critical-soft: var(--critical-soft);
+  --color-high: var(--high);
+  --color-medium: var(--medium);
+  --color-low: var(--low);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-route: var(--route);
+  --color-route-soft: var(--route-soft);
+  --color-teal: var(--teal);
+  --color-teal-soft: var(--teal-soft);
+
+  /* Semantic roles — point these at the brand to re-skin the whole app.
+     Components reference --color-primary, not raw gold, so a rebrand is a
+     one-line change here. */
+  --color-primary: var(--gold);
+  --color-primary-contrast: var(--on-accent);
+
+  --radius-card: 0.875rem;
+  --radius-tile: 0.75rem;
+
+  /* Elevation — theme-aware (soft shadow in light, subtle inset in dark) */
+  --shadow-card: var(--shadow-card-runtime);
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  /* Honor the OS text-size / dynamic-type setting instead of locking size */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ------------------------------------------------------------------ */
+/* Accessibility baseline                                              */
+/* ------------------------------------------------------------------ */
+
+/* text-gold resolves to the AA-safe text gold (not the fill gold). This is an
+   unlayered rule, so it wins over Tailwind's layered `.text-gold` utility while
+   bg-gold / border-gold keep the brand --gold. Fixes ~122 text-gold usages at
+   once with zero per-file edits. */
+.text-gold {
+  color: var(--gold-text);
+}
+
+/* Visible focus ring for keyboard / switch-control / external-keyboard users
+   (WCAG 2.4.7). :where() = zero specificity, so any component can override. */
+:where(button, [role="button"], a, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-tile);
+}
+
+/* Respect reduced-motion: kill the infinite pulses/sweeps/spins and snap
+   transitions. Keeps the app calm for motion-sensitive users. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Entrance transitions ──────────────────────────────────────────────────
+   Reusable so content eases in instead of blinking. `.animate-in` for a single
+   block that swaps in (loaded data replacing a skeleton); `.stagger` on a list
+   container cascades its direct children. The reduced-motion block above already
+   neutralizes both for motion-sensitive users. */
+@keyframes enter-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-in { animation: enter-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.stagger > * { animation: enter-up 0.34s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.stagger > *:nth-child(1) { animation-delay: 0.02s; }
+.stagger > *:nth-child(2) { animation-delay: 0.06s; }
+.stagger > *:nth-child(3) { animation-delay: 0.10s; }
+.stagger > *:nth-child(4) { animation-delay: 0.14s; }
+.stagger > *:nth-child(5) { animation-delay: 0.18s; }
+.stagger > *:nth-child(6) { animation-delay: 0.22s; }
+.stagger > *:nth-child(7) { animation-delay: 0.26s; }
+.stagger > *:nth-child(8) { animation-delay: 0.30s; }
+.stagger > *:nth-child(9) { animation-delay: 0.34s; }
+/* Cap the cascade so a long list's tail doesn't lag. */
+.stagger > *:nth-child(n+10) { animation-delay: 0.38s; }
+
+/* Skeleton shimmer — the single loading primitive (use the <Skeleton> component) */
+@keyframes skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-2) 25%,
+    var(--line) 37%,
+    var(--surface-2) 63%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-tile);
+}
+
+/* Full-height chat layout: make IonContent's shadow scroll container a flex
+   column so a child with flex-1 fills the viewport (a plain height:100% child
+   of IonContent does NOT resolve — its scroll host has no explicit height).
+   This is the reliable Ionic pattern for chat-style screens. */
+ion-content.chat-fill::part(scroll) {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ionic content wrappers should inherit the page background */
+ion-app,
+ion-content,
+ion-router-outlet {
+  background: var(--background);
+}
+
+/* Uppercase tracked label used across the design */
+.label-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* Card surface from the Figma */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 0.875rem;
+}
+/* Elevated enterprise card (subtle depth + top sheen).
+   The gradient + shadow are theme-driven runtime vars so the card reads as a
+   dark-gray inset in DARK and a crisp white card with a soft shadow in LIGHT. */
+.card-elev {
+  background: var(--surface-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+/* Hairline divider that matches the line token */
+.hairline {
+  height: 1px;
+  background: var(--line);
+}
+/* ------------------------------------------------------------------ */
+/* Press system — the canonical native tap affordance                  */
+/* (See: shared press contract. `.pressable` is the explicit class;    */
+/* native <button> and [role="button"] inherit the same feel globally) */
+/* ------------------------------------------------------------------ */
+
+/* Canonical press affordance. A crisp press-in scale + slight fade, with
+   the gray mobile tap-highlight removed and text un-selectable so a press
+   never starts a text selection. */
+.pressable {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 120ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 120ms cubic-bezier(0.2, 0, 0, 1), background-color 150ms ease;
+}
+.pressable:active {
+  transform: scale(0.96);
+  opacity: 0.92;
+}
+
+/* GLOBAL default press: any native button (not disabled) and any element with
+   role="button" gets the SAME native press feel automatically — no class
+   needed. Also removes the gray tap-highlight flash app-wide on interactive
+   elements. Ionic's own controls (ion-*) are excluded so we never fight their
+   built-in ripple/press behavior. */
+button,
+[role="button"],
+a,
+label[for],
+summary {
+  -webkit-tap-highlight-color: transparent;
+}
+button:not(:disabled):not(.no-press):not([class*="ion-"]),
+[role="button"]:not(.no-press) {
+  touch-action: manipulation;
+  transition: transform 120ms cubic-bezier(0.2, 0, 0, 1),
+    opacity 120ms cubic-bezier(0.2, 0, 0, 1), background-color 150ms ease;
+}
+button:not(:disabled):not(.no-press):not([class*="ion-"]):active,
+[role="button"]:not(.no-press):active {
+  transform: scale(0.96);
+  opacity: 0.92;
+}
+
+/* GLOBAL default radius — safety net so NO button ever renders square. Uses the
+   zero-specificity :where() selector, so ANY explicit Tailwind rounded-* utility
+   (rounded-full, rounded-2xl, rounded-lg, rounded-md, …) always wins over it.
+   Ionic custom elements are excluded (their internal parts own their geometry),
+   and `.no-round` is an explicit opt-out. Class-based rules like .radio-fab-float
+   (border-radius:9999px) also win, since a class has higher specificity than
+   :where(). Token --radius-tile = 0.75rem, the most common existing radius. */
+:where(button, [role="button"]):not(.no-round):not([class*="ion-"]) {
+  border-radius: var(--radius-tile);
+}
+
+/* Opt-out: things that must not scale (full-width sticky bars, the radio FAB,
+   tab buttons, etc.). Still suppresses the tap-highlight flash. */
+.no-press {
+  -webkit-tap-highlight-color: transparent;
+}
+.no-press,
+.no-press:active {
+  transform: none !important;
+  opacity: inherit;
+}
+
+/* Sticky-hover fix: on touch devices a :hover background can "stick" after a
+   tap until the next interaction. Where a hover background is applied via the
+   Tailwind `hover:bg-*` utilities it is generated as `&:hover { ... }` — we
+   can't rewrite those here, but we ensure :active always wins by virtue of the
+   global :active rule above (it scales + fades regardless of a stuck hover bg),
+   and we neutralize lingering hover on real touch (no fine pointer). */
+@media (hover: none) {
+  button:hover,
+  [role="button"]:hover,
+  .pressable:hover {
+    background-color: revert-layer;
+  }
+}
+
+/* Hide scrollbars on horizontal scrollers but keep scrolling */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ------------------------------------------------------------------ */
+/* Futuristic touches                                                  */
+/* ------------------------------------------------------------------ */
+
+/* Big tappable action buttons — never clip the label */
+.btn-xl {
+  min-height: 54px;
+  padding: 0.9rem 1rem;
+  line-height: 1.15;
+  border-radius: 0.875rem;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Gold glow used on the on-duty hero + primary accents */
+.glow-gold {
+  box-shadow: 0 0 0 1px rgba(212, 160, 23, 0.25),
+    0 8px 40px -12px rgba(212, 160, 23, 0.45);
+}
+.glow-online {
+  box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3),
+    0 8px 44px -14px rgba(34, 197, 94, 0.5);
+}
+
+/* Faint tech grid overlay */
+.grid-overlay {
+  background-image:
+    linear-gradient(rgba(212, 160, 23, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212, 160, 23, 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Live pulsing dot (on-duty indicator) */
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
+  70% { box-shadow: 0 0 0 9px rgba(34, 197, 94, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+}
+.pulse-dot {
+  animation: pulse-ring 2s infinite;
+}
+
+/* Camera shutter button — a gold ring that pulses outward to invite the tap,
+   plus a springy press. The pulse stops while pressed and when disabled. */
+@keyframes shutter-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0.5); }
+  70%  { box-shadow: 0 0 0 16px rgba(212, 160, 23, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(212, 160, 23, 0); }
+}
+.shutter-btn:not(:disabled) {
+  animation: shutter-pulse 2s ease-out infinite;
+}
+.shutter-btn:active {
+  animation: none;
+  transform: scale(0.88);
+}
+
+/* Brief white flash over the viewfinder at the moment of capture. */
+@keyframes shutter-flash {
+  0%   { opacity: 0; }
+  12%  { opacity: 0.9; }
+  100% { opacity: 0; }
+}
+.shutter-flash {
+  animation: shutter-flash 320ms ease-out forwards;
+}
+
+/* Sweeping scanline highlight on the hero */
+@keyframes sweep {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(220%); }
+}
+.scanline::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    rgba(212, 160, 23, 0.12) 50%,
+    transparent 70%
+  );
+  transform: translateX(-120%);
+  animation: sweep 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Bottom-sheet enter animations — native slide-up panel + backdrop fade. */
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+@keyframes sheet-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.sheet-panel { animation: sheet-up 300ms cubic-bezier(0.22, 1, 0.36, 1); will-change: transform; }
+.sheet-backdrop { animation: sheet-fade 240ms ease-out; }
+/* Bottom-sheet EXIT — slide back down + fade the backdrop (native dismiss). */
+@keyframes sheet-down {
+  from { transform: translateY(0); }
+  to { transform: translateY(100%); }
+}
+@keyframes sheet-fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+.sheet-panel-out { animation: sheet-down 260ms cubic-bezier(0.4, 0, 1, 1) forwards; will-change: transform; }
+.sheet-backdrop-out { animation: sheet-fade-out 240ms ease-in forwards; }
+
+/* Full-screen modals (forms) — prevents the footer/button being clipped by a
+   content-sized sheet. Header uses safe-top, footers add safe-bottom padding. */
+ion-modal {
+  --height: 100%;
+  --width: 100%;
+  --border-radius: 0;
+  --background: var(--background);
+}
+/* Make the modal's content part a full-height flex column so form bodies that use
+   `flex h-full` (IncidentForm, VisitorModal) fill the screen instead of collapsing
+   to a shrunken box — the same reason a height:100% child of IonContent collapses. */
+ion-modal::part(content) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Respect device safe areas (notch / home indicator) inside Capacitor */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Map Ionic's safe-area variables to the real device insets so the tab bar,
+   toolbars and content all clear the notch / home indicator. Without this,
+   Ionic falls back to 0 and the bottom tab bar is jammed against the home
+   indicator on devices with a tall safe area (e.g. iPhone 17 Pro Max). */
+:root {
+  --ion-safe-area-top: env(safe-area-inset-top);
+  --ion-safe-area-bottom: env(safe-area-inset-bottom);
+  --ion-safe-area-left: env(safe-area-inset-left);
+  --ion-safe-area-right: env(safe-area-inset-right);
+}
+
+/* Bottom tab bar: lift the buttons above the home indicator with comfortable
+   padding, and grow the bar by the safe-area inset instead of overlapping it. */
+ion-tab-bar {
+  height: auto;
+  min-height: 54px;
+  padding-top: 6px;
+  padding-bottom: calc(env(safe-area-inset-bottom) + 8px);
+}
+ion-tab-button {
+  --padding-top: 4px;
+  --padding-bottom: 0;
+}
+
+/* Center RADIO control. The IonTabButton keeps the column + gold label; the
+   actual button is a FLOATING overlay (below) so it lifts above the bar without
+   being clipped by the tab bar's bounds. */
+.tab-radio-slot .radio-slot-spacer {
+  display: block;
+  height: 22px; /* reserves the space the floating button hovers over */
+  width: 1px;
+}
+.tab-radio-slot .radio-label {
+  color: var(--gold) !important;
+  font-weight: 700;
+}
+
+/* Raised gold push-to-talk button, floating on top of the tab bar. The thick
+   navy ring makes it read as a cut-out lifting out of the bar. Sits below
+   Ionic overlays/modals (z-index ~20000) so it never covers them. */
+.radio-fab-float {
+  position: fixed;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom) + 24px);
+  transform: translateX(-50%);
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  height: 58px;
+  width: 58px;
+  border-radius: 9999px;
+  color: var(--on-accent);
+  background: radial-gradient(circle at 50% 30%, #e9bb46, #c8860a);
+  box-shadow:
+    0 0 0 6px var(--background),
+    0 0 0 7px rgba(212, 160, 23, 0.5),
+    0 0 0 13px rgba(212, 160, 23, 0.12),
+    0 10px 30px -6px rgba(212, 160, 23, 0.85);
+  transition: transform 0.12s ease;
+}
+/* !important so the global button :active scale (higher specificity) never
+   clobbers the FAB's translateX-aware press transform. */
+.radio-fab-float:active {
+  transform: translateX(-50%) scale(0.93) !important;
+  opacity: 1 !important;
+}
+/* When the guard has dragged the FAB it carries an inline transform:none and
+   left/top, so the press scale would lose its centering offset — that's fine,
+   the inline style wins and there's no translateX to preserve. */
+.radio-fab-float.is-active {
+  box-shadow:
+    0 0 0 6px var(--background),
+    0 0 0 8px rgba(212, 160, 23, 0.85),
+    0 0 0 14px rgba(212, 160, 23, 0.18),
+    0 10px 34px -6px rgba(212, 160, 23, 0.95);
+}
+
+/* Hide scrollbars everywhere — iOS WKWebView shows an ugly native scroll
+   indicator on the right while scrolling. Scrolling still works as normal. */
+* {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* old Edge */
+}
+*::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none;
+}
+/* Ionic's content scroller lives in shadow DOM — reach it via ::part. */
+ion-content::part(scroll) {
+  scrollbar-width: none;
+}
+ion-content::part(scroll)::-webkit-scrollbar {
+  display: none;
+}

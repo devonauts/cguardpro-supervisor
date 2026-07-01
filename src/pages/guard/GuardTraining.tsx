@@ -1,0 +1,254 @@
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { useHistory } from "react-router-dom";
+import {
+  GraduationCap,
+  Award,
+  BookOpen,
+  ChevronRight,
+  CheckCircle2,
+  Clock,
+  Trophy,
+} from "lucide-react";
+import { Screen } from "@/components/Screen";
+import { Card, EmptyState, ErrorState, SkeletonList, StatCard } from "@/components/ui";
+import { Segmented } from "@/components/ui/kit";
+import { useAsync } from "@/lib/useAsync";
+import { fmtDate } from "@/lib/format";
+import fb from "@/lib/feedback";
+import {
+  trainingService,
+  type TrainingCourseRow,
+  type TrainingCertificateRow,
+} from "@/lib/services";
+
+type Tab = "courses" | "achievements";
+
+const STATUS_COLOR: Record<TrainingCourseRow["status"], string> = {
+  assigned: "var(--low)",
+  in_progress: "var(--gold)",
+  completed: "var(--online)",
+  expired: "var(--critical)",
+};
+
+export default function GuardTraining() {
+  const { t } = useTranslation();
+  const [tab, setTab] = useState<Tab>("courses");
+
+  return (
+    <Screen root title={t("training.title")} subtitle={t("training.subtitle")}>
+      <Segmented<Tab>
+        className="mb-4"
+        value={tab}
+        onChange={setTab}
+        options={[
+          { value: "courses", label: t("training.tabs.courses"), icon: <BookOpen size={16} /> },
+          { value: "achievements", label: t("training.tabs.achievements"), icon: <Award size={16} /> },
+        ]}
+      />
+
+      {tab === "courses" ? <CoursesTab /> : <AchievementsTab />}
+    </Screen>
+  );
+}
+
+/* ----------------------------------------------------------------- Courses */
+function CoursesTab() {
+  const { t } = useTranslation();
+  const history = useHistory();
+  const { data, loading, error, reload } = useAsync(() =>
+    trainingService.myCourses(),
+  );
+  const rows = data?.rows || [];
+
+  if (loading) return <SkeletonList />;
+  if (error && !data) return <ErrorState onRetry={reload} />;
+  if (!rows.length) {
+    return (
+      <EmptyState
+        icon={<GraduationCap size={28} />}
+        title={t("training.empty")}
+        hint={t("training.emptyHint")}
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      {rows.map((c) => (
+        <CourseCard
+          key={c.id}
+          course={c}
+          onOpen={() => {
+            fb.tap();
+            history.push(`/guard/training/${c.id}`);
+          }}
+        />
+      ))}
+      <button
+        onClick={() => {
+          fb.tap();
+          reload();
+        }}
+        className="mx-auto block rounded-xl pt-1 text-xs text-muted"
+      >
+        {t("common.refresh")}
+      </button>
+    </div>
+  );
+}
+
+function CourseCard({
+  course,
+  onOpen,
+}: {
+  course: TrainingCourseRow;
+  onOpen: () => void;
+}) {
+  const { t } = useTranslation();
+  const color = STATUS_COLOR[course.status];
+  const pct = Math.max(0, Math.min(100, course.progressPercentage || 0));
+  const cta =
+    course.status === "completed"
+      ? t("training.review")
+      : course.status === "in_progress"
+        ? t("training.continue")
+        : t("training.start");
+
+  return (
+    <Card className="p-4" onClick={onOpen}>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-ink">
+            {course.courseTitle}
+          </p>
+          <span
+            className="mt-1.5 inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold"
+            style={{
+              color,
+              borderColor: `color-mix(in srgb, ${color} 33%, transparent)`,
+              background: `color-mix(in srgb, ${color} 8%, transparent)`,
+            }}
+          >
+            {course.status === "completed" ? (
+              <CheckCircle2 size={11} />
+            ) : (
+              <Clock size={11} />
+            )}
+            {t(`training.status.${course.status}`)}
+          </span>
+        </div>
+        <ChevronRight size={18} className="mt-0.5 shrink-0 text-low" />
+      </div>
+
+      <div className="mt-3 h-2 overflow-hidden rounded-full bg-surface-2">
+        <div
+          className="h-full rounded-full"
+          style={{ width: `${pct}%`, background: color, transition: "width 500ms ease" }}
+        />
+      </div>
+      <div className="mt-2 flex items-center justify-between text-xs text-muted">
+        <span>{t("training.progress", { pct })}</span>
+        <span className="font-semibold text-gold">{cta}</span>
+      </div>
+      {course.status !== "completed" && course.dueDate && (
+        <p className="mt-1 text-[11px] text-muted">
+          {t("training.due", { date: fmtDate(course.dueDate) })}
+        </p>
+      )}
+      {course.status === "completed" && course.completedAt && (
+        <p className="mt-1 text-[11px] text-online">
+          {t("training.completedOn", { date: fmtDate(course.completedAt) })}
+        </p>
+      )}
+    </Card>
+  );
+}
+
+/* ------------------------------------------------------------ Achievements */
+function AchievementsTab() {
+  const { t } = useTranslation();
+  const history = useHistory();
+  const { data, loading, error, reload } = useAsync(() =>
+    trainingService.certificates(),
+  );
+  const rows = data?.rows || [];
+  const totalPoints = useMemo(
+    () => rows.reduce((s, c) => s + (c.pointsValue || 0), 0),
+    [rows],
+  );
+
+  if (loading) return <SkeletonList />;
+  if (error && !data) return <ErrorState onRetry={reload} />;
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-3 gap-3">
+        <StatCard
+          icon={<Trophy size={16} />}
+          value={totalPoints}
+          label={t("training.achievements.totalPoints")}
+          accent="gold"
+        />
+        <StatCard
+          icon={<Award size={16} />}
+          value={rows.length}
+          label={t("training.achievements.certificatesEarned")}
+        />
+        <StatCard
+          icon={<CheckCircle2 size={16} />}
+          value={rows.length}
+          label={t("training.achievements.coursesDone")}
+        />
+      </div>
+
+      {!rows.length ? (
+        <EmptyState
+          icon={<Award size={28} />}
+          title={t("training.achievements.empty")}
+          hint={t("training.achievements.emptyHint")}
+        />
+      ) : (
+        <div className="space-y-3">
+          {rows.map((c) => (
+            <CertCard
+              key={c.id}
+              cert={c}
+              onOpen={() => {
+                fb.tap();
+                history.push(`/guard/training/certificate/${c.id}`);
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CertCard({
+  cert,
+  onOpen,
+}: {
+  cert: TrainingCertificateRow;
+  onOpen: () => void;
+}) {
+  const { t } = useTranslation();
+  return (
+    <Card className="flex items-center gap-3 p-4" onClick={onOpen}>
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold/15 text-gold">
+        <Award size={22} />
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-ink">{cert.courseTitle}</p>
+        <p className="mt-0.5 text-[11px] text-muted">
+          {t("training.achievements.serial", { serial: cert.serialNumber })}
+        </p>
+        <p className="text-[11px] text-muted">
+          {t("training.achievements.issuedOn", { date: fmtDate(cert.issuedAt) })}
+        </p>
+      </div>
+      <ChevronRight size={18} className="shrink-0 text-low" />
+    </Card>
+  );
+}
