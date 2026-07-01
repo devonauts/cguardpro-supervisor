@@ -3,7 +3,7 @@
 # which has already sourced ~/.config/cguardpro/env and cd'd into the worker-app folder.
 set -uo pipefail
 
-APP="${1:-cguardpro}"
+APP="${1:-supervisor}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
@@ -33,7 +33,7 @@ doctor() {
   # firebase match
   python3 - "$ROOT" <<'PY'
 import json,plistlib,sys
-root=sys.argv[1]; bid="com.cguardpro.operaciones"
+root=sys.argv[1]; bid="com.cguardpro.supervisor"
 try:
     d=json.load(open(f"{root}/android/app/google-services.json"))
     pk=[c['client_info']['android_client_info']['package_name'] for c in d['client']]
