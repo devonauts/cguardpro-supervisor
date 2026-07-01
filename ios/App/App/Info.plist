@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-        <string>CGuardPro Supervisor</string>
+	<string>CGuardPro Supervisor</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -22,6 +22,18 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>CGuardPro Supervisor usa la cámara para tomar fotos de verificación en las paradas de tu ruta de patrullaje.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>CGuardPro Supervisor usa tu ubicación para el marcaje de entrada, la navegación a cada parada y la verificación de tu ruta de patrullaje.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>CGuardPro Supervisor usa el micrófono para grabar notas de voz.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>CGuardPro Supervisor puede guardar imágenes en tu galería.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CGuardPro Supervisor usa tu galería para adjuntar fotos de verificación en las paradas.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>CGuardPro Supervisor usa el reconocimiento de voz para dictar notas por texto.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
