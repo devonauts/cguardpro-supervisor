@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "40699556630",
+    "project_id": "supervisor-app-9fac4",
+    "storage_bucket": "supervisor-app-9fac4.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:40699556630:android:53e6ea728ddfdf9b735637",
+        "android_client_info": {
+          "package_name": "com.cguardpro.supervisor"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDAhZQEyF3bFCEoVg_5Cb4OzGUyXqmJXeo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
