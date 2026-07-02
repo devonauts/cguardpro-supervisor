@@ -520,3 +520,52 @@ ion-content::part(scroll) {
 ion-content::part(scroll)::-webkit-scrollbar {
   display: none;
 }
+
+/* ============================================================= */
+/* OSM futuristic map (self-hosted tiles → dark "explorer" look) */
+/* ============================================================= */
+.leaflet-container { background: #0b0c0e; font: inherit; }
+/* Invert the light raster tiles into a night palette + subtle cool tint. */
+.osm-dark-tiles {
+  filter: invert(1) hue-rotate(188deg) brightness(0.86) contrast(0.96) saturate(0.7);
+}
+.osm-map-wrap {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  box-shadow:
+    0 16px 40px -16px rgba(0, 0, 0, 0.75),
+    inset 0 0 0 1px rgba(212, 160, 23, 0.08),
+    inset 0 0 60px -20px rgba(212, 160, 23, 0.12);
+}
+/* Top/bottom vignette for depth + a faint gold horizon glow. */
+.osm-map-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(130% 90% at 50% -10%, rgba(212, 160, 23, 0.10) 0%, transparent 45%),
+    linear-gradient(180deg, transparent 55%, rgba(11, 12, 14, 0.55) 100%);
+}
+/* Glowing stop nodes. */
+.osm-pin-dot {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+  color: #0b0c0e;
+  background: var(--c, #d4a017);
+  border: 1.5px solid #0b0c0e;
+  box-shadow:
+    0 0 0 3px color-mix(in srgb, var(--c, #d4a017) 28%, transparent),
+    0 0 14px -1px var(--c, #d4a017),
+    0 2px 6px rgba(0, 0, 0, 0.55);
+}
+
+/* Card depth (box shadow) for the matte-black surfaces. */
+.card, .card-elev { box-shadow: 0 10px 28px -14px rgba(0, 0, 0, 0.7); }

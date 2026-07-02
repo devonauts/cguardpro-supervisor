@@ -1,0 +1,122 @@
+import { useEffect, useRef } from "react";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { OSM, osrmRoute } from "@/lib/osm";
+
+export interface OsmPoint {
+  lat: number;
+  lng: number;
+  label?: string;
+  order?: number;
+  status?: "done" | "current" | "pending" | string;
+}
+
+interface Props {
+  points?: OsmPoint[];
+  height?: number;
+  /** Draw the driving route (OSRM) through the stops. */
+  showRoute?: boolean;
+  className?: string;
+}
+
+const STATUS_COLOR: Record<string, string> = {
+  done: "#22c55e",
+  current: "#d4a017",
+  pending: "#8a8f98",
+};
+
+// Guayaquil, EC — sensible default when no stops have coordinates yet.
+const DEFAULT_CENTER: [number, number] = [-2.1709, -79.9224];
+
+/**
+ * Futuristic dark map built on the self-hosted OSM tile server (see lib/osm).
+ * Raster tiles are inverted to a night palette via CSS (.osm-dark-tiles); stops
+ * render as glowing gold/green nodes and the OSRM driving line threads them.
+ * Degrades gracefully: no coords → default view; OSRM down → dashed straight legs.
+ */
+export function OsmMap({
+  points = [],
+  height = 260,
+  showRoute = true,
+  className = "",
+}: Props) {
+  const elRef = useRef<HTMLDivElement>(null);
+  const mapRef = useRef<L.Map | null>(null);
+
+  useEffect(() => {
+    if (!elRef.current) return;
+    const valid = points.filter(
+      (p) => Number.isFinite(p.lat) && Number.isFinite(p.lng),
+    );
+
+    const map = L.map(elRef.current, {
+      zoomControl: false,
+      attributionControl: false,
+      dragging: true,
+      scrollWheelZoom: false,
+    }).setView(valid.length ? [valid[0].lat, valid[0].lng] : DEFAULT_CENTER, 14);
+    mapRef.current = map;
+
+    L.tileLayer(OSM.tileUrl, {
+      maxZoom: 19,
+      className: "osm-dark-tiles",
+      crossOrigin: true,
+    }).addTo(map);
+
+    const bounds = L.latLngBounds([]);
+    valid.forEach((p, i) => {
+      const color = STATUS_COLOR[p.status || "pending"] || "#d4a017";
+      L.marker([p.lat, p.lng], {
+        icon: L.divIcon({
+          className: "osm-pin",
+          html: `<span class="osm-pin-dot" style="--c:${color}">${p.order ?? i + 1}</span>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+        }),
+        keyboard: false,
+      }).addTo(map);
+      bounds.extend([p.lat, p.lng]);
+    });
+
+    if (showRoute && valid.length >= 2) {
+      const legs: Array<[number, number]> = valid.map((p) => [p.lat, p.lng]);
+      osrmRoute(legs)
+        .then((line) => {
+          if (!mapRef.current || !line.length) throw new Error("empty");
+          L.polyline(line, { color: "#d4a017", weight: 9, opacity: 0.14 }).addTo(map);
+          L.polyline(line, { color: "#e8c14a", weight: 3.5, opacity: 0.95 }).addTo(map);
+        })
+        .catch(() => {
+          if (!mapRef.current) return;
+          L.polyline(legs, {
+            color: "#d4a017",
+            weight: 3,
+            opacity: 0.7,
+            dashArray: "2 8",
+          }).addTo(map);
+        });
+    }
+
+    if (valid.length > 1) map.fitBounds(bounds.pad(0.3));
+    else if (valid.length === 1) map.setView([valid[0].lat, valid[0].lng], 15);
+
+    // Leaflet needs a size recalc once the container has laid out.
+    const t = setTimeout(() => map.invalidateSize(), 200);
+
+    return () => {
+      clearTimeout(t);
+      map.remove();
+      mapRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(points), showRoute]);
+
+  return (
+    <div className={`osm-map-wrap ${className}`} style={{ height }}>
+      <div ref={elRef} className="h-full w-full" />
+      <div className="osm-map-vignette" aria-hidden="true" />
+    </div>
+  );
+}
+
+export default OsmMap;

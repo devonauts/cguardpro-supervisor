@@ -11,10 +11,38 @@ import {
 import { Screen } from "@/components/Screen";
 import { EmptyState, ErrorState, SkeletonList, Skeleton } from "@/components/ui";
 import { Button } from "@/components/ui/kit";
-import { RouteMap, type RoutePoint } from "@/components/RouteMap";
+import { type RoutePoint } from "@/components/RouteMap";
+import { OsmMap } from "@/components/OsmMap";
+import NotificationBell from "@/components/NotificationBell";
 import { supervisorRoute } from "@/lib/supervisorRoute";
+import { operationsService } from "@/lib/services";
 import { useAuth } from "@/context/AuthContext";
 import { useAsync } from "@/lib/useAsync";
+
+/** Small matte stat tile for the dashboard header row. */
+function StatTile({
+  label,
+  value,
+  accent,
+}: {
+  label: string;
+  value: React.ReactNode;
+  accent?: boolean;
+}) {
+  return (
+    <div className="card-elev px-2 py-3 text-center">
+      <p
+        className="text-xl font-bold tabular-nums text-ink"
+        style={accent ? { color: "#ef4444" } : undefined}
+      >
+        {value}
+      </p>
+      <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-muted">
+        {label}
+      </p>
+    </div>
+  );
+}
 
 /* -------------------------------------------------------------- normalizers */
 
@@ -141,9 +169,10 @@ export default function DashboardMap() {
     : t(g.key, g.def);
 
   const { data, loading, error, reload } = useAsync(async () => {
-    const [routes, clock] = await Promise.all([
+    const [routes, clock, kpis] = await Promise.all([
       supervisorRoute.today().catch(() => []),
       supervisorRoute.clockStatus().catch(() => null),
+      operationsService.kpis().catch(() => []),
     ]);
     const first = Array.isArray(routes) ? routes[0] : (routes as any);
     let detail: any = first;
@@ -152,16 +181,27 @@ export default function DashboardMap() {
     return {
       route: normalizeRoute(detail),
       clockedIn: isClockedIn(clock),
+      kpis: Array.isArray(kpis) ? kpis : [],
     };
   }, []);
 
   const route = data?.route ?? null;
+  const kpis = data?.kpis ?? [];
+  const kpiVal = (...ids: string[]) => {
+    for (const id of ids) {
+      const k = (kpis as any[]).find((x) => x?.id === id);
+      if (k != null && k.value != null) return k.value;
+    }
+    return null;
+  };
+
+  const bell = <NotificationBell />;
 
   /* --------------------------------------------------------- loading state */
   if (loading && !data) {
     return (
-      <Screen root largeTitle={greeting} title={greeting}>
-        <Skeleton className="h-[240px] w-full rounded-2xl" />
+      <Screen root largeTitle={greeting} title={greeting} right={bell}>
+        <Skeleton className="h-[260px] w-full rounded-2xl" />
         <div className="mt-4">
           <SkeletonList rows={3} />
         </div>
@@ -172,13 +212,19 @@ export default function DashboardMap() {
   /* ----------------------------------------------------------- error state */
   if (error && !data) {
     return (
-      <Screen root largeTitle={greeting} title={greeting} onRefresh={reload}>
+      <Screen root largeTitle={greeting} title={greeting} right={bell} onRefresh={reload}>
         <ErrorState onRetry={reload} />
       </Screen>
     );
   }
 
   const clockedIn = data?.clockedIn ?? false;
+  const hasRoute = !!route && route.total > 0;
+  const pct = hasRoute
+    ? Math.round((route!.completed / route!.total) * 100)
+    : 0;
+  const onDuty = kpiVal("guardsOnDuty", "activeGuards", "guardsActive", "onDutyGuards");
+  const openInc = kpiVal("openIncidents", "incidentsOpen", "activeIncidents");
 
   const clockPrompt = !clockedIn && (
     <button
@@ -201,82 +247,90 @@ export default function DashboardMap() {
     </button>
   );
 
-  /* ----------------------------------------------------------- empty state */
-  if (!route || route.total === 0) {
-    return (
-      <Screen root largeTitle={greeting} title={greeting} onRefresh={reload}>
-        {clockPrompt}
-        <EmptyState
-          icon={<RouteIcon size={26} />}
-          title={t("supervisor.route.none", "Sin ruta asignada hoy")}
-          hint={t(
-            "supervisor.route.noneHint",
-            "No tienes una ruta de rondas programada para hoy."
-          )}
-        />
-      </Screen>
-    );
-  }
-
-  const pct = route.total
-    ? Math.round((route.completed / route.total) * 100)
-    : 0;
-
   return (
-    <Screen root largeTitle={greeting} title={greeting} onRefresh={reload}>
+    <Screen root largeTitle={greeting} title={greeting} right={bell} onRefresh={reload}>
       {clockPrompt}
 
-      {/* Route map overview */}
-      <RouteMap points={route.points} height={240} />
+      {/* Futuristic map — self-hosted OSM tiles, live route */}
+      <OsmMap points={route?.points ?? []} height={260} showRoute />
 
-      {/* Summary card */}
-      <div className="mt-4 card-elev p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="label-eyebrow">{t("supervisor.todayRoute", "Ruta de hoy")}</p>
-            <p className="mt-1 truncate text-lg font-bold text-ink">
-              {route.name || t("supervisor.route.today", "Ruta de hoy")}
-            </p>
-            <div className="mt-1 flex items-center gap-1.5 text-sm text-muted">
-              <MapPin size={14} className="text-gold" />
-              <span>
-                {t("supervisor.stopsCount", "{{count}} paradas", {
-                  count: route.total,
-                })}
-              </span>
+      {/* Live stats */}
+      <div className="mt-4 grid grid-cols-3 gap-2.5">
+        <StatTile
+          label={t("supervisor.stat.stops", "Paradas")}
+          value={hasRoute ? `${route!.completed}/${route!.total}` : "—"}
+        />
+        <StatTile
+          label={t("supervisor.stat.onDuty", "En servicio")}
+          value={onDuty ?? "—"}
+        />
+        <StatTile
+          label={t("supervisor.stat.incidents", "Novedades")}
+          value={openInc ?? "—"}
+          accent={Number(openInc) > 0}
+        />
+      </div>
+
+      {hasRoute ? (
+        <>
+          {/* Route summary */}
+          <div className="mt-4 card-elev p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="label-eyebrow">{t("supervisor.todayRoute", "Ruta de hoy")}</p>
+                <p className="mt-1 truncate text-lg font-bold text-ink">
+                  {route!.name || t("supervisor.route.today", "Ruta de hoy")}
+                </p>
+                <div className="mt-1 flex items-center gap-1.5 text-sm text-muted">
+                  <MapPin size={14} className="text-gold" />
+                  <span>
+                    {t("supervisor.stopsCount", "{{count}} paradas", {
+                      count: route!.total,
+                    })}
+                  </span>
+                </div>
+              </div>
+              <div className="shrink-0 text-right">
+                <p className="text-2xl font-bold tabular-nums text-ink">
+                  {route!.completed}
+                  <span className="text-muted">/{route!.total}</span>
+                </p>
+                <p className="text-[11px] uppercase tracking-wide text-muted">
+                  {t("supervisor.route.progress", "Progreso")}
+                </p>
+              </div>
+            </div>
+            <div className="mt-4 h-2 overflow-hidden rounded-full bg-surface-2">
+              <div
+                className="h-full rounded-full bg-gold"
+                style={{ width: `${pct}%`, transition: "width 500ms ease" }}
+              />
             </div>
           </div>
-          <div className="shrink-0 text-right">
-            <p className="text-2xl font-bold tabular-nums text-ink">
-              {route.completed}
-              <span className="text-muted">/{route.total}</span>
-            </p>
-            <p className="text-[11px] uppercase tracking-wide text-muted">
-              {t("supervisor.route.progress", "Progreso")}
-            </p>
-          </div>
-        </div>
 
-        {/* Progress bar */}
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-surface-2">
-          <div
-            className="h-full rounded-full bg-gold"
-            style={{ width: `${pct}%`, transition: "width 500ms ease" }}
+          <div className="mt-4">
+            <Button full onClick={() => history.push("/supervisor/route")}>
+              <span className="inline-flex items-center gap-2">
+                <PlayCircle size={20} />
+                {route!.started
+                  ? t("supervisor.continueRoute", "Continuar ruta")
+                  : t("supervisor.startRoute", "Iniciar ruta")}
+              </span>
+            </Button>
+          </div>
+        </>
+      ) : (
+        <div className="mt-4">
+          <EmptyState
+            icon={<RouteIcon size={26} />}
+            title={t("supervisor.route.none", "Sin ruta asignada hoy")}
+            hint={t(
+              "supervisor.route.noneHint",
+              "No tienes una ruta de rondas programada para hoy."
+            )}
           />
         </div>
-      </div>
-
-      {/* Primary action */}
-      <div className="mt-4">
-        <Button full onClick={() => history.push("/supervisor/route")}>
-          <span className="inline-flex items-center gap-2">
-            <PlayCircle size={20} />
-            {route.started
-              ? t("supervisor.continueRoute", "Continuar ruta")
-              : t("supervisor.startRoute", "Iniciar ruta")}
-          </span>
-        </Button>
-      </div>
+      )}
     </Screen>
   );
 }
