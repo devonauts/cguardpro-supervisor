@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Interactive launcher for CGuardPro store builds. Invoked by the `uploadApps` shell function,
-# which has already sourced ~/.config/cguardpro/env and cd'd into the worker-app folder.
+# which has already sourced ~/.config/cguardpro/env, prepended THIS app's dir to PATH, and
+# cd'd into it — so bare `pyBuild`/`Install` and the `./` forms both target this app.
 set -uo pipefail
 
 APP="${1:-supervisor}"
