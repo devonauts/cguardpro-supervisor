@@ -122,6 +122,20 @@ export const supervisorRoute = {
   respondDispatch: (incidentId: string, status: "accepted" | "enRoute" | "onScene") =>
     api.post(tenantPath(`/supervisor/me/incidents/${incidentId}/respond`), { status }).then(unwrap),
 
+  /** Guard attendance management (approve/reject punches, decide requests). */
+  attendancePending: () =>
+    api.get(tenantPath("/supervisor/me/attendance/pending")).then(unwrap),
+  attendanceDecideClockIn: (id: string, status: "approved" | "rejected", notes?: string) =>
+    api.post(tenantPath(`/supervisor/me/attendance/clock-in-requests/${id}/decision`), { status, notes }).then(unwrap),
+  attendanceDecideClockOut: (id: string, status: "approved" | "rejected", notes?: string) =>
+    api.post(tenantPath(`/supervisor/me/attendance/clock-out-requests/${id}/decision`), { status, notes }).then(unwrap),
+  attendanceApprove: (id: string, notes?: string) =>
+    api.post(tenantPath(`/supervisor/me/attendance/${id}/approve`), { notes }).then(unwrap),
+  attendanceReject: (id: string, notes?: string) =>
+    api.post(tenantPath(`/supervisor/me/attendance/${id}/reject`), { notes }).then(unwrap),
+  attendanceResolveException: (id: string) =>
+    api.post(tenantPath(`/supervisor/me/attendance/exceptions/${id}/resolve`), { status: "resolved" }).then(unwrap),
+
   /** Clock in (selfie/vehicle/geo in body). */
   clockIn: (body?: unknown) =>
     api.post(tenantPath("/supervisor/me/clock-in"), body).then(unwrap),
