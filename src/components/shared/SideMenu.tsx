@@ -3,8 +3,8 @@ import { menuController } from "@ionic/core/components";
 import { useHistory, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
-  Siren, Bell, ShieldAlert, Users2, Route as RouteIcon,
-  CalendarDays, Shirt, LifeBuoy, User, LogOut,
+  ShieldAlert, Users2, Route as RouteIcon,
+  CalendarDays, Shirt, LifeBuoy, LogOut,
 } from "lucide-react";
 import brandLogo from "@/assets/brand-logo.png";
 import { useAuth } from "@/context/AuthContext";
@@ -30,16 +30,15 @@ export function SideMenu() {
 
   // Only destinations NOT already in the bottom tab bar (Dashboard / Stations /
   // Guards / Messages / Reports live there) — the menu never duplicates the tabs.
+  // Emergency (SOS FAB), Notifications + Profile (top-bar NavActions) already have
+  // dedicated entry points, so they're intentionally NOT duplicated here.
   const items: { icon: React.ReactNode; label: string; to: string }[] = [
     { icon: <ShieldAlert size={20} />, label: t("nav.incidents", "Novedades"), to: "/supervisor/incidents" },
-    { icon: <Siren size={20} />, label: t("sos.title", "Emergencia"), to: "/supervisor/emergency" },
-    { icon: <Bell size={20} />, label: t("notif.title", "Notificaciones"), to: "/supervisor/notifications" },
     { icon: <Users2 size={20} />, label: t("visitors.title", "Visitantes"), to: "/supervisor/visitors" },
     { icon: <RouteIcon size={20} />, label: t("nav.route", "Ruta"), to: "/supervisor/route" },
     { icon: <CalendarDays size={20} />, label: t("nav.schedule", "Horario"), to: "/supervisor/schedule" },
     { icon: <Shirt size={20} />, label: t("uniform.title", "Uniforme"), to: "/supervisor/uniform" },
     { icon: <LifeBuoy size={20} />, label: t("backupConfirm.title", "Respaldo"), to: "/supervisor/backup" },
-    { icon: <User size={20} />, label: t("nav.profile", "Perfil"), to: "/supervisor/profile" },
   ];
 
   const go = async (to: string) => {
