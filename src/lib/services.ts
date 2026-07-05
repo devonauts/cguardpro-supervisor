@@ -574,6 +574,37 @@ export const messageService = {
 export type MessageAttachment = { url: string; type: "image" | "video" | "audio"; name?: string; sizeInBytes?: number };
 
 /* ------------------------------------------------------------------ */
+/* Staff messaging — the supervisor is STAFF (admin-side), so their     */
+/* inbox is the CRM /message API (admin↔guard/client threads + groups), */
+/* not the guard /guard/me/messages inbox. Mirrors messageService.      */
+/* ------------------------------------------------------------------ */
+export const staffMessageService = {
+  /** My PRIVATE conversations (scoped to me — NOT the shared CRM inbox). */
+  listThreads: (params?: Record<string, any>) => {
+    const qs = params ? "?" + new URLSearchParams(params as Record<string, string>).toString() : "";
+    return api.get(tenantPath(`/supervisor/me/messages${qs}`)).then(unwrap);
+  },
+  /** A thread: { conversation, rows, nextCursor }. */
+  thread: async (id: string, params?: Record<string, any>) => {
+    const qs = params ? "?" + new URLSearchParams(params as Record<string, string>).toString() : "";
+    const [conv, msgs] = await Promise.all([
+      api.get(tenantPath(`/supervisor/me/messages/${id}`)).then(unwrap).catch(() => null),
+      api.get(tenantPath(`/supervisor/me/messages/${id}/messages${qs}`)).then(unwrap),
+    ]);
+    return { conversation: (conv && ((conv as any).conversation || conv)) || null, rows: (msgs as any)?.rows || [], nextCursor: (msgs as any)?.nextCursor };
+  },
+  send: (id: string, body: string, clientMsgId: string, attachments?: MessageAttachment[]) =>
+    api.post(tenantPath(`/supervisor/me/messages/${id}`), { data: { body, clientMsgId, attachments: attachments && attachments.length ? attachments : undefined } }).then(unwrap),
+  /** Start a conversation with a recipient (guard/client). Returns { conversationId, message }. */
+  create: (recipientType: string, recipientId: string, body: string, clientMsgId: string, opts?: { subject?: string; attachments?: MessageAttachment[] }) =>
+    api.post(tenantPath(`/supervisor/me/messages`), { data: { recipientType, recipientId, body, clientMsgId, subject: opts?.subject, attachments: opts?.attachments && opts.attachments.length ? opts.attachments : undefined } }).then(unwrap),
+  markRead: (id: string) => api.post(tenantPath(`/supervisor/me/messages/${id}/read`), { data: {} }).then(unwrap),
+  /** Delete the conversation FOR ME ONLY (WhatsApp-style hide). */
+  remove: (id: string) => api.delete(tenantPath(`/supervisor/me/messages/${id}`)).then(unwrap),
+  uploadAttachment: (file: File) => messageService.uploadAttachment(file),
+};
+
+/* ------------------------------------------------------------------ */
 /* Radio check (pase de novedades) — the guard answers a roll-call     */
 /* ------------------------------------------------------------------ */
 export const radioCheckService = {

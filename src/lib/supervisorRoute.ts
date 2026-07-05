@@ -34,6 +34,12 @@ export const supervisorRoute = {
       .post(tenantPath(`/supervisor/me/routes/${routeId}/finish`), body)
       .then(unwrap),
 
+  /** Notify CRM + client that the supervisor is en route to a stop with an ETA. */
+  notifyEta: (routeId: string, pointId: string, etaMinutes: number) =>
+    api
+      .post(tenantPath(`/supervisor/me/routes/${routeId}/stops/${pointId}/notify-eta`), { etaMinutes })
+      .then(unwrap),
+
   /** Live station monitor for the dashboard map (pins + status summary). */
   stations: () =>
     api.get(tenantPath("/supervisor/me/stations")).then(unwrap),

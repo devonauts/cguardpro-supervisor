@@ -115,9 +115,9 @@ export default function IncidentDetail() {
 
   const right = (
     <div className="flex items-center gap-0.5">
-      <button type="button" aria-label={t("guards.chat", "Chat")} onClick={() => setNoteOpen(true)} className="pressable grid h-9 w-9 place-items-center rounded-full text-ink active:bg-surface-2"><MessageSquare size={20} /></button>
-      <button type="button" aria-label={t("guards.call", "Llamar")} onClick={() => fb.tap()} className="pressable grid h-9 w-9 place-items-center rounded-full text-ink active:bg-surface-2"><Phone size={20} /></button>
-      <button type="button" aria-label={t("guards.more", "Más")} onClick={() => fb.tap()} className="pressable grid h-9 w-9 place-items-center rounded-full text-ink active:bg-surface-2"><MoreVertical size={20} /></button>
+      <button type="button" aria-label={t("guards.chat", "Chat")} onClick={() => setNoteOpen(true)} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><MessageSquare size={20} /></button>
+      <button type="button" aria-label={t("guards.call", "Llamar")} onClick={() => fb.tap()} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><Phone size={20} /></button>
+      <button type="button" aria-label={t("guards.more", "Más")} onClick={() => fb.tap()} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><MoreVertical size={20} /></button>
     </div>
   );
 
@@ -358,7 +358,7 @@ export default function IncidentDetail() {
           {(guardsAsync.data || []).map((g: any) => (
             <button key={g.id} type="button" className="flex items-center gap-3 rounded-xl px-2 py-3 text-left active:bg-surface-2"
               onClick={() => act(async () => { await supervisorRoute.incidentAssign(i.id, g.userId || g.id, g.name); setReassignOpen(false); }, t("incidentDetail.reassigned", "Incidente reasignado"))}>
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-surface-2 text-[11px] font-bold text-muted">{(g.name || "?").slice(0, 1)}</span>
+              <span className="grid h-11 w-11 place-items-center rounded-full bg-surface-2 text-[11px] font-bold text-muted">{(g.name || "?").slice(0, 1)}</span>
               <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-ink">{g.name}</span>
             </button>
           ))}

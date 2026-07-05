@@ -62,8 +62,12 @@ export default function FloatingRadioButton() {
     if (!d.moved) return;
     const w = ref.current?.offsetWidth ?? SIZE;
     const h = ref.current?.offsetHeight ?? SIZE;
+    // Reserve the always-visible tab bar (~64px) + safe-area so the PTT button
+    // can't be parked over the tab bar and block tab taps.
+    const saV = getComputedStyle(document.documentElement).getPropertyValue("--ion-safe-area-bottom");
+    const tabClear = 64 + (parseFloat(saV) || 0);
     const x = Math.max(8, Math.min(window.innerWidth - w - 8, e.clientX - d.ox));
-    const y = Math.max(8, Math.min(window.innerHeight - h - 8, e.clientY - d.oy));
+    const y = Math.max(8, Math.min(window.innerHeight - h - 8 - tabClear, e.clientY - d.oy));
     setPos({ x, y });
   };
 

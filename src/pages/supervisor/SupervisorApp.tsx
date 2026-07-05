@@ -32,6 +32,11 @@ import Profile from "../shared/Profile";
 import RouteToday from "./RouteToday";
 import RouteExecution from "./RouteExecution";
 import StopCheck from "./StopCheck";
+import RoutePrep from "./RoutePrep";
+import RouteTimeline from "./RouteTimeline";
+import RouteMissionStop from "./RouteMissionStop";
+import RouteArrival from "./RouteArrival";
+import RouteSummary from "./RouteSummary";
 import SupervisorClockIn from "./SupervisorClockIn";
 import CheckInOut from "./CheckInOut";
 import More from "./More";
@@ -84,6 +89,12 @@ export default function SupervisorApp() {
 
         {/* Vehicle-patrol route flow (not tabbed) */}
         <Route exact path="/supervisor/route" component={RouteToday} />
+        {/* Multi-step mission flow (slide-to-start → prep → timeline → stops) */}
+        <Route exact path="/supervisor/route/:routeId/prep" component={RoutePrep} />
+        <Route exact path="/supervisor/route/:routeId/timeline" component={RouteTimeline} />
+        <Route exact path="/supervisor/route/:routeId/summary" component={RouteSummary} />
+        <Route exact path="/supervisor/route/:routeId/mission/:index/arrive" component={RouteArrival} />
+        <Route exact path="/supervisor/route/:routeId/mission/:index" component={RouteMissionStop} />
         <Route exact path="/supervisor/route/:routeId" component={RouteExecution} />
         <Route
           exact

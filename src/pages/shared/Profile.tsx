@@ -257,7 +257,7 @@ export default function Profile() {
             setSheet("lang");
           }}
           aria-label={t("profile.settings", "Ajustes")}
-          className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted active:bg-surface-2"
+          className="grid h-11 w-11 place-items-center rounded-full border border-line text-muted active:bg-surface-2"
         >
           <Settings size={18} />
         </button>

@@ -287,7 +287,7 @@ export function Sheet({
         {title && (
           <div className="flex items-center justify-between px-5 pb-1">
             <h3 className="text-base font-bold text-ink">{title}</h3>
-            <button onClick={onClose} className="pressable -mr-1 p-1 text-muted" aria-label={t("common.close", "Cerrar")}>
+            <button onClick={onClose} className="pressable -mr-2 grid h-11 w-11 place-items-center text-muted" aria-label={t("common.close", "Cerrar")}>
               <X size={20} />
             </button>
           </div>

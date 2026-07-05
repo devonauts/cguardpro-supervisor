@@ -1,0 +1,104 @@
+/* Component-scoped styles for the Incidents screen (SupervisorIncidents.tsx). */
+
+/* Stat cards */
+.statCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  width: 132px;
+  flex-shrink: 0;
+  padding: 0.75rem 0.9rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: var(--surface-elev);
+  text-align: left;
+}
+.statTop { display: flex; align-items: center; gap: 0.5rem; }
+.statVal { font-size: 24px; font-weight: 800; color: var(--ink); font-variant-numeric: tabular-nums; }
+.statLabel { font-size: 13px; font-weight: 600; color: var(--ink); }
+.statLink { font-size: 12px; font-weight: 700; }
+
+/* Severity tabs */
+.tabs { display: flex; gap: 1.25rem; overflow-x: auto; border-bottom: 1px solid var(--line); }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  position: relative;
+  flex-shrink: 0;
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.5rem 0.1rem 0.7rem;
+  font-size: 14px; font-weight: 600; color: var(--muted); white-space: nowrap;
+}
+.tabActive { color: var(--gold); }
+.tabActive::after {
+  content: ""; position: absolute; left: 0; right: 0; bottom: -1px;
+  height: 2px; border-radius: 9999px; background: var(--gold);
+}
+.tabDot { width: 7px; height: 7px; border-radius: 9999px; }
+
+/* Search + sort + view toggle */
+.searchWrap { position: relative; flex: 1 1 0; }
+.searchInput {
+  width: 100%;
+  padding: 0.8rem 0.9rem 0.8rem 2.3rem;
+  border-radius: 0.875rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 14px;
+}
+.searchInput::placeholder { color: var(--muted); }
+.searchIcon { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); color: var(--muted); }
+.sortBtn {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.8rem 0.9rem; min-height: 46px;
+  border-radius: 0.875rem; border: 1px solid var(--line); background: var(--surface);
+  color: var(--ink); font-size: 13px; font-weight: 600; white-space: nowrap;
+}
+.viewToggle { display: flex; gap: 0.25rem; padding: 0.25rem; border-radius: 0.75rem; border: 1px solid var(--line); }
+.viewBtn { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 0.55rem; color: var(--muted); }
+.viewBtnActive { background: color-mix(in srgb, var(--gold) 16%, transparent); color: var(--gold); }
+
+/* Incident card */
+.card {
+  display: flex;
+  gap: 0.875rem;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: var(--surface-elev);
+  text-align: left;
+  width: 100%;
+}
+.thumb {
+  width: 92px;
+  align-self: stretch;
+  min-height: 92px;
+  flex-shrink: 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: var(--surface-2);
+  position: relative;
+}
+.thumb img { width: 100%; height: 100%; object-fit: cover; }
+.thumbPh { display: grid; place-items: center; width: 100%; height: 100%; color: var(--muted); }
+.thumbCount {
+  position: absolute; bottom: 4px; right: 4px;
+  padding: 1px 6px; border-radius: 6px;
+  background: rgba(0, 0, 0, 0.62); color: #fff;
+  font-size: 10px; font-weight: 700;
+  display: flex; align-items: center; gap: 3px;
+}
+.body { min-width: 0; flex: 1 1 0; display: flex; flex-direction: column; }
+.title { font-size: 16px; font-weight: 700; color: var(--ink); line-height: 1.25; margin: 0.25rem 0; }
+.metaRow { display: flex; align-items: center; gap: 0.35rem; font-size: 13px; color: var(--ink); opacity: 0.85; }
+.metaRow + .metaRow { margin-top: 0.2rem; }
+.metaMuted { display: flex; align-items: center; gap: 0.35rem; font-size: 12px; color: var(--muted); }
+
+/* Badges */
+.badge {
+  display: inline-flex; align-items: center;
+  padding: 0.15rem 0.55rem; border-radius: 0.45rem;
+  font-size: 10.5px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase;
+}
+.side { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; flex-shrink: 0; }
+.eyeRow { display: flex; align-items: center; gap: 0.4rem; color: var(--muted); }

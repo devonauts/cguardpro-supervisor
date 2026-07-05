@@ -1,0 +1,228 @@
+/*
+ * Component-scoped styles for the Station Details screen (StationDetail.tsx).
+ * Presentational customizations live here; layout stays Tailwind in the TSX.
+ * Colors reference theme runtime tokens so light/dark both work.
+ */
+
+/* ---- status + tag pills ---- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  padding: 0.125rem 0.625rem;
+  font-size: 12px;
+  font-weight: 700;
+}
+.statusActive { color: var(--online); border-color: color-mix(in srgb, var(--online) 40%, transparent); }
+.statusAttention { color: var(--gold); border-color: color-mix(in srgb, var(--gold) 40%, transparent); }
+.statusOffline { color: var(--muted); border-color: var(--line-2); }
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--surface-2);
+  color: var(--muted);
+}
+.tagDanger {
+  background: color-mix(in srgb, var(--critical) 14%, transparent);
+  color: var(--critical);
+}
+
+/* ---- hero photo ---- */
+.heroPhoto {
+  width: 118px;
+  height: 118px;
+  flex-shrink: 0;
+  border-radius: 1rem;
+  object-fit: cover;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+}
+
+/* ---- KPI strip ---- */
+.kpi {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-left: 0.75rem;
+}
+.kpi + .kpi {
+  border-left: 1px solid var(--line);
+}
+.kpiValue {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.kpiLabel {
+  font-size: 11px;
+  color: var(--muted);
+}
+.kpiLink {
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* ---- segmented tabs ---- */
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  overflow-x: auto;
+  border-bottom: 1px solid var(--line);
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  position: relative;
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem 0.75rem;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.tabActive { color: var(--gold); }
+.tabActive::after {
+  content: "";
+  position: absolute;
+  left: 0.35rem;
+  right: 0.35rem;
+  bottom: -1px;
+  height: 2px;
+  border-radius: 9999px;
+  background: var(--gold);
+}
+.tabDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: var(--critical);
+}
+
+/* ---- assigned-guard card ---- */
+.guardCard {
+  width: 152px;
+  flex-shrink: 0;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.875rem;
+  text-align: center;
+}
+.guardAvatarWrap {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  margin: 0 auto;
+}
+.guardAvatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  object-fit: cover;
+  background: var(--surface-2);
+  border: 2px solid var(--line);
+}
+.guardDot {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 14px;
+  height: 14px;
+  border-radius: 9999px;
+  border: 2px solid var(--surface);
+}
+.dotPatrolling { background: var(--online); }
+.dotBreak { background: var(--gold); }
+.dotOff { background: var(--low, #6b7280); }
+.miniBtn {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  flex: 1 1 0;
+  padding: 0.5rem 0;
+  border-radius: 0.5rem;
+  background: var(--surface-2);
+}
+
+/* ---- station-information rows ---- */
+.infoLabel {
+  font-size: 11px;
+  color: var(--muted);
+}
+.infoValue {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* ---- Add Task sheet ---- */
+.field { display: flex; flex-direction: column; gap: 0.5rem; }
+.fieldLabel { font-size: 13px; font-weight: 600; color: var(--muted); }
+.taskInput {
+  width: 100%;
+  min-height: 104px;
+  padding: 0.875rem 1rem;
+  border-radius: 0.875rem;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.4;
+  resize: none;
+}
+.taskInput::placeholder { color: var(--muted); }
+.prioRow { display: flex; gap: 0.5rem; }
+.prioBtn {
+  flex: 1 1 0;
+  min-height: 2.75rem;
+  padding: 0.625rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.prioBtnActive { background: var(--gold); color: var(--on-accent); border-color: transparent; }
+.submitBtn {
+  width: 100%;
+  min-height: 3.25rem;
+  border-radius: 0.875rem;
+  background: var(--gold);
+  color: var(--on-accent);
+  font-size: 16px;
+  font-weight: 700;
+}
+.submitBtn:disabled { opacity: 0.5; }
+
+/* ---- quick-action tiles ---- */
+.quickTile {
+  display: flex;
+  min-height: 84px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 1rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  padding: 0.7rem 0.3rem;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.15;
+  word-break: break-word;
+}

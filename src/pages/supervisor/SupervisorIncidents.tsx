@@ -235,7 +235,7 @@ export default function SupervisorIncidents() {
           type="button"
           aria-label={t("incidents.logIncident", "Nueva")}
           onClick={() => { fb.press(); setFormOpen(true); }}
-          className="pressable fixed bottom-24 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-gold text-on-accent shadow-lg shadow-black/30"
+          className="pressable fixed bottom-24 left-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-gold text-on-accent shadow-lg shadow-black/30"
           style={{ marginBottom: "env(safe-area-inset-bottom)" }}
         >
           <Plus size={26} />

@@ -185,14 +185,14 @@ export default function GuardSchedule() {
 
       {/* Period header + nav */}
       <div className="mb-3 flex items-center justify-between">
-        <button onClick={() => step(-1)} className="grid h-9 w-9 place-items-center rounded-full text-muted active:bg-surface-2"><ChevronLeft size={20} /></button>
+        <button onClick={() => step(-1)} className="grid h-11 w-11 place-items-center rounded-full text-muted active:bg-surface-2"><ChevronLeft size={20} /></button>
         <div className="flex items-center gap-2">
           <span className="text-[15px] font-bold capitalize text-ink">{periodLabel}</span>
           {!sameDay(anchor, today) && (
             <button onClick={goToday} className="rounded-full border border-line px-2 py-0.5 text-[11px] font-semibold text-gold active:bg-gold/10">{t("schedule.today", "Hoy")}</button>
           )}
         </div>
-        <button onClick={() => step(1)} className="grid h-9 w-9 place-items-center rounded-full text-muted active:bg-surface-2"><ChevronRight size={20} /></button>
+        <button onClick={() => step(1)} className="grid h-11 w-11 place-items-center rounded-full text-muted active:bg-surface-2"><ChevronRight size={20} /></button>
       </div>
 
       {loading ? (

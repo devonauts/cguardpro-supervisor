@@ -50,7 +50,7 @@ export default function GuardMessages() {
         <button
           onClick={() => { fb.tap(); setComposing(true); }}
           aria-label={t("messages.new", "Nuevo mensaje")}
-          className="grid h-9 w-9 place-items-center rounded-full border border-line text-muted active:bg-surface-2"
+          className="grid h-11 w-11 place-items-center rounded-full border border-line text-muted active:bg-surface-2"
         >
           <SquarePen size={18} />
         </button>

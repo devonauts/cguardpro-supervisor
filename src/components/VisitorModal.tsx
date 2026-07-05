@@ -665,7 +665,7 @@ function PersonForm({ fields, setFields, photos, facePhoto, addPhoto, removePhot
         </Field>
 
         <Field label={t("visitor.idType")}>
-          <div className="flex gap-1 rounded-full border border-line bg-surface-2 p-1">
+          <div className="no-scrollbar flex gap-1 overflow-x-auto rounded-full border border-line bg-surface-2 p-1">
             {ID_TYPES.map((ty) => (
               <button
                 key={ty}
@@ -785,7 +785,7 @@ function VehicleForm({ photos, facePhoto, addPhoto, removePhoto, station, onDone
                 key={ty}
                 type="button"
                 onClick={() => setVehicleType(ty)}
-                className={`min-h-11 flex-1 rounded-full px-1 py-3 text-[13px] font-semibold transition-colors ${
+                className={`min-h-11 shrink-0 whitespace-nowrap rounded-full px-3.5 py-3 text-[13px] font-semibold transition-colors ${
                   vehicleType === ty
                     ? "bg-gold text-on-accent shadow-sm"
                     : "text-muted active:bg-surface"

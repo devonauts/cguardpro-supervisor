@@ -1,5 +1,4 @@
 import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import {
   IonPage,
   IonContent,
@@ -8,7 +7,7 @@ import {
   isPlatform,
 } from "@ionic/react";
 import { useHistory } from "react-router-dom";
-import { ChevronLeft } from "lucide-react";
+import { TopBar } from "./shared/TopBar";
 
 // The app runs in Material mode globally (setupIonicReact mode: "md"), but the
 // MD pull-to-refresh is unreliable and non-native inside the iOS WKWebView. On
@@ -52,6 +51,9 @@ export function Screen({
   avatar,
   header,
   fill,
+  flush,
+  onPointerDown,
+  onMenu,
 }: {
   title?: string;
   titleClassName?: string;
@@ -69,6 +71,13 @@ export function Screen({
   root?: boolean;
   /** Full-height, non-scrolling page (the child owns its own scroll/layout — e.g. chat). */
   fill?: boolean;
+  /** Large-title mode only: skip the default px-4 child padding (the screen manages
+   *  its own horizontal padding / sticky sub-headers). */
+  flush?: boolean;
+  /** Forwarded to the scrollable IonContent (e.g. resume audio on tap — radio). */
+  onPointerDown?: (e: React.PointerEvent) => void;
+  /** Leading hamburger on root screens (shows when there's no back button). */
+  onMenu?: () => void;
   /** When set, renders the collapsing iOS-style large title instead of `title`. */
   largeTitle?: string;
   largeSubtitle?: string;
@@ -79,14 +88,13 @@ export function Screen({
   /** Fully custom header node (takes precedence over title/largeTitle). */
   header?: ReactNode;
 }) {
-  const { t } = useTranslation();
   const history = useHistory();
   // Sub-pages show a back button by default; only tab roots opt out via `root`.
   const showBack = back === true || !root;
   const goBack = () => {
     if (backHref) history.push(backHref);
     else if (history.length > 1) history.goBack();
-    else history.push("/guard/dashboard");
+    else history.push("/supervisor/dashboard");
   };
 
   // Large-title collapse only needs the 0..52px range; clamp + rAF-throttle so we
@@ -150,49 +158,24 @@ export function Screen({
           scrollEvents
           forceOverscroll={REFRESH_MODE === "ios"}
           onIonScroll={onScroll}
+          onPointerDown={onPointerDown}
         >
           {refresher}
 
-          {/* Sticky collapsed bar — blurs in + reveals the compact title on scroll */}
-          <div
-            className="safe-top sticky top-0 z-30"
-            style={{
-              background: `color-mix(in srgb, var(--background) ${
-                (0.55 + 0.4 * p) * 100
-              }%, transparent)`,
-              backdropFilter: p > 0.02 ? "blur(14px)" : "none",
-              WebkitBackdropFilter: p > 0.02 ? "blur(14px)" : "none",
-              borderBottom: `1px solid color-mix(in srgb, var(--line) ${
-                p * 100
-              }%, transparent)`,
-            }}
-          >
-            <div className="flex h-12 items-center justify-between gap-3 px-4">
-              <div
-                className="flex min-w-0 items-center gap-2.5"
-                style={{ opacity: p, transform: `translateY(${(1 - p) * 6}px)` }}
-              >
-                {avatar}
-                <span className="truncate text-[17px] font-semibold text-ink">
-                  {compactTitle || largeTitle}
-                </span>
-              </div>
-              {right && <div className="shrink-0">{right}</div>}
-            </div>
-          </div>
+          <TopBar
+            variant="large"
+            onMenu={onMenu}
+            largeTitle={largeTitle}
+            compactTitle={compactTitle}
+            largeSubtitle={largeSubtitle}
+            right={right}
+            avatar={avatar}
+            showBack={showBack}
+            onBack={goBack}
+            progress={p}
+          />
 
-          {/* Large title — scrolls away as you scroll up */}
-          <div
-            className="px-4 pb-2 pt-1"
-            style={{ opacity: 1 - p, transform: `translateY(${-p * 6}px)` }}
-          >
-            <h1 className="text-[32px] font-extrabold leading-[1.08] tracking-tight text-ink">
-              {largeTitle}
-            </h1>
-            {largeSubtitle && <p className="mt-1.5 text-sm text-muted">{largeSubtitle}</p>}
-          </div>
-
-          <div className="px-4 pb-6 pt-1 safe-bottom">{children}</div>
+          <div className={`${flush ? "" : "px-4 pt-1"} pb-6 safe-bottom`}>{children}</div>
         </IonContent>
       </IonPage>
     );
@@ -207,26 +190,7 @@ export function Screen({
     return (
       <IonPage>
         <IonContent className="chat-fill" forceOverscroll={false}>
-          <div className="safe-top bg-surface-2 border-b border-line shrink-0">
-            <div className="flex items-start justify-between gap-3 px-4 pb-3 pt-3">
-              <div className="flex min-w-0 items-start gap-1.5">
-                {showBack && (
-                  <button
-                    onClick={goBack}
-                    aria-label={t("aria.back", "Atrás")}
-                    className="pressable -ml-1.5 mt-0.5 shrink-0 rounded-full p-1.5 text-ink active:bg-surface-2"
-                  >
-                    <ChevronLeft size={22} />
-                  </button>
-                )}
-                <div className="min-w-0">
-                  <h1 className={`font-bold text-ink ${titleClassName}`}>{title}</h1>
-                  {subtitle && <p className="mt-0.5 truncate text-xs text-muted">{subtitle}</p>}
-                </div>
-              </div>
-              {right && <div className="shrink-0">{right}</div>}
-            </div>
-          </div>
+          <TopBar variant="bar" onMenu={onMenu} elevated title={title} titleClassName={titleClassName} subtitle={subtitle} right={right} showBack={showBack} onBack={goBack} />
           <div className="flex min-h-0 flex-1 flex-col bg-background">{children}</div>
         </IonContent>
       </IonPage>
@@ -237,28 +201,7 @@ export function Screen({
   return (
     <IonPage>
       <IonContent forceOverscroll={REFRESH_MODE === "ios"}>
-        <div className="safe-top bg-surface-2 border-b border-line">
-          <div className="flex items-start justify-between gap-3 px-4 pb-3 pt-3">
-            <div className="flex min-w-0 items-start gap-1.5">
-              {showBack && (
-                <button
-                  onClick={goBack}
-                  aria-label={t("aria.back", "Atrás")}
-                  className="-ml-1.5 mt-0.5 shrink-0 rounded-full p-1.5 text-ink active:bg-surface-2"
-                >
-                  <ChevronLeft size={22} />
-                </button>
-              )}
-              <div className="min-w-0">
-                <h1 className={`font-bold text-ink ${titleClassName}`}>{title}</h1>
-                {subtitle && (
-                  <p className="mt-0.5 truncate text-xs text-muted">{subtitle}</p>
-                )}
-              </div>
-            </div>
-            {right && <div className="shrink-0">{right}</div>}
-          </div>
-        </div>
+        <TopBar variant="bar" onMenu={onMenu} title={title} titleClassName={titleClassName} subtitle={subtitle} right={right} showBack={showBack} onBack={goBack} />
 
         {refresher}
 

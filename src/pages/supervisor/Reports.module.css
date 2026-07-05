@@ -1,0 +1,55 @@
+/* Component-scoped styles for the Reports analytics dashboard. */
+
+.tabs { display: flex; gap: 0.6rem; overflow-x: auto; padding: 0 1rem; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex-shrink: 0; display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.7rem 1rem; border-radius: 0.9rem; border: 1px solid var(--line);
+  background: var(--surface-elev); color: var(--muted); font-size: 14px; font-weight: 600; white-space: nowrap;
+}
+.tabActive { border-color: var(--gold); background: color-mix(in srgb, var(--gold) 14%, transparent); color: var(--gold); }
+
+.statCard {
+  flex-shrink: 0; width: 150px; padding: 0.9rem 1rem;
+  border-radius: 1rem; border: 1px solid var(--line); background: var(--surface-elev);
+}
+.statTop { display: flex; align-items: center; justify-content: space-between; }
+.statLabel { font-size: 13px; color: var(--muted); }
+.statVal { font-size: 26px; font-weight: 800; color: var(--ink); margin-top: 0.15rem; }
+.statUnit { font-size: 14px; font-weight: 600; color: var(--muted); }
+.statDelta { display: flex; align-items: center; gap: 0.25rem; font-size: 12.5px; font-weight: 700; margin-top: 0.35rem; }
+.statVs { font-size: 11.5px; color: var(--faint); margin-top: 0.05rem; }
+
+.dateBar {
+  display: flex; align-items: center; gap: 0.6rem; margin: 0 1rem;
+  padding: 0.75rem 0.9rem; border-radius: 1rem; border: 1px solid var(--line); background: var(--surface-elev);
+}
+.dateLabel { flex: 1; font-size: 14px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 0.5rem; }
+.exportBtn { display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem 0.9rem; border-radius: 0.7rem; border: 1px solid var(--gold); color: var(--gold); font-size: 14px; font-weight: 700; }
+
+.card { border-radius: 1.1rem; border: 1px solid var(--line); background: var(--surface-elev); padding: 1rem; }
+.cardHead { display: flex; align-items: center; justify-content: space-between; }
+.cardTitle { display: flex; align-items: center; gap: 0.55rem; font-size: 15.5px; font-weight: 800; color: var(--ink); }
+.seeAll { font-size: 13px; font-weight: 700; color: var(--gold); }
+.bigNum { font-size: 30px; font-weight: 800; color: var(--ink); line-height: 1.05; }
+.bigSub { font-size: 13px; color: var(--muted); }
+
+/* Guard performance */
+.perfRow { display: flex; align-items: center; gap: 0.75rem; padding: 0.5rem 0; }
+.perfAvatar { width: 40px; height: 40px; border-radius: 9999px; overflow: hidden; flex-shrink: 0; background: var(--surface-2); display: grid; place-items: center; color: var(--muted); }
+.perfAvatar img { width: 100%; height: 100%; object-fit: cover; }
+.perfName { font-size: 14.5px; font-weight: 600; color: var(--ink); }
+.perfTrack { height: 6px; border-radius: 9999px; background: var(--surface-2); overflow: hidden; margin-top: 0.3rem; }
+.perfFill { height: 100%; border-radius: 9999px; }
+.perfPct { font-size: 14px; font-weight: 800; flex-shrink: 0; width: 44px; text-align: right; }
+.viewAll { display: flex; align-items: center; justify-content: center; gap: 0.4rem; width: 100%; margin-top: 0.75rem; padding: 0.8rem; border-radius: 0.9rem; border: 1px solid var(--line); color: var(--info); font-size: 14px; font-weight: 700; }
+
+/* Legend (donut) */
+.legendRow { display: flex; align-items: center; gap: 0.6rem; font-size: 13.5px; }
+.legendDot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
+.legendLabel { flex: 1; color: var(--muted); }
+.legendVal { font-weight: 800; color: var(--ink); }
+
+.chartTip { border-radius: 0.6rem; border: 1px solid var(--line); background: var(--surface-2); padding: 0.4rem 0.7rem; }
+.chartTipDate { font-size: 11px; color: var(--muted); }
+.chartTipVal { font-size: 16px; font-weight: 800; }

@@ -121,7 +121,7 @@ export function StartShiftModal({
           {/* station status */}
           <div className="rounded-card border border-line bg-surface p-4">
             <div className="flex items-center gap-2">
-              <div className="grid h-9 w-9 place-items-center rounded-lg bg-gold-soft">
+              <div className="grid h-11 w-11 place-items-center rounded-lg bg-gold-soft">
                 <ShieldCheck size={18} className="text-gold" />
               </div>
               <div className="min-w-0">

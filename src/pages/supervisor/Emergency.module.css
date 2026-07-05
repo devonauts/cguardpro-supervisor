@@ -1,0 +1,72 @@
+/* Component-scoped styles for Emergency.tsx — the SOS screen (always dark/red). */
+
+.screen {
+  min-height: 100%;
+  background:
+    radial-gradient(120% 60% at 50% 0%, rgba(220, 38, 38, 0.28), transparent 60%),
+    #0a0708;
+  color: #fff;
+}
+
+/* SOS button */
+.sosWrap { position: relative; display: grid; place-items: center; padding: 1.5rem 0 0.5rem; }
+.sosRings { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; }
+.sosRing { position: absolute; border-radius: 9999px; border: 1px solid rgba(239, 68, 68, 0.35); animation: sospulse 2.6s ease-out infinite; }
+@keyframes sospulse { 0% { transform: scale(0.6); opacity: 0.7; } 100% { transform: scale(1.35); opacity: 0; } }
+.sosBtn {
+  position: relative; width: 210px; height: 210px; aspect-ratio: 1 / 1; border-radius: 50%;
+  display: grid; place-items: center; text-align: center;
+  background: radial-gradient(circle at 50% 40%, #ff4d4d, #c81e1e 62%, #7f1010);
+  box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.12), 0 0 90px 6px rgba(239, 68, 68, 0.55);
+  color: #fff; user-select: none; -webkit-user-select: none; touch-action: manipulation;
+}
+.sosBtn:active { transform: scale(0.97); }
+.sosText { font-size: 58px; font-weight: 900; letter-spacing: 2px; line-height: 1; text-shadow: 0 2px 24px rgba(0,0,0,0.35); }
+.sosSub { margin-top: 0.4rem; font-size: 15px; font-weight: 800; letter-spacing: 1px; }
+.sosHint { margin-top: 0.75rem; max-width: 20rem; text-align: center; font-size: 13.5px; color: rgba(255,255,255,0.72); }
+
+/* Quick action cards */
+.actionCard {
+  display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+  padding: 1rem 0.5rem; border-radius: 1rem;
+  background: rgba(120, 20, 20, 0.28); border: 1px solid rgba(239, 68, 68, 0.35);
+  text-align: center;
+}
+.actionCard:active { background: rgba(160, 26, 26, 0.4); }
+.actionIcon { width: 56px; height: 56px; border-radius: 9999px; background: #fff; display: grid; place-items: center; color: #dc2626; }
+.actionTitle { font-size: 15px; font-weight: 800; color: #fff; }
+.actionSub { font-size: 12px; color: rgba(255,255,255,0.62); line-height: 1.25; }
+
+/* Info cards (share GPS / cameras) */
+.infoCard {
+  display: flex; align-items: center; gap: 0.9rem; padding: 1rem;
+  border-radius: 1rem; background: rgba(120, 20, 20, 0.18); border: 1px solid rgba(239, 68, 68, 0.28);
+}
+.infoIcon { width: 52px; height: 52px; border-radius: 9999px; display: grid; place-items: center; flex-shrink: 0; }
+.infoTitle { font-size: 15px; font-weight: 800; color: #fff; }
+.infoText { font-size: 13px; color: rgba(255,255,255,0.62); line-height: 1.3; }
+.infoBtn {
+  display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+  flex-shrink: 0; min-height: 2.9rem; padding: 0 1.1rem; border-radius: 9999px;
+  font-size: 14px; font-weight: 800;
+}
+.infoBtnPrimary { background: #dc2626; color: #fff; }
+.infoBtnGhost { background: transparent; color: #fff; border: 1px solid rgba(239, 68, 68, 0.55); }
+
+/* Section label */
+.section { font-size: 13px; font-weight: 800; letter-spacing: 0.6px; color: #ef4444; text-transform: uppercase; margin: 1.25rem 0 0.6rem; }
+
+/* Active location */
+.locCard { border-radius: 1rem; background: rgba(20, 12, 12, 0.7); border: 1px solid rgba(239, 68, 68, 0.22); padding: 1rem; }
+.locMap { width: 128px; height: 108px; border-radius: 0.75rem; overflow: hidden; flex-shrink: 0; background: #14161b; }
+.locName { font-size: 16px; font-weight: 800; color: #fff; }
+.locAddr { font-size: 13px; color: rgba(255,255,255,0.66); }
+.gpsBtn { width: 44px; height: 44px; border-radius: 9999px; display: grid; place-items: center; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.7); flex-shrink: 0; }
+
+/* Contacts */
+.contact { display: flex; align-items: center; gap: 0.85rem; padding: 0.85rem 1rem; border-radius: 1rem; background: rgba(20, 12, 12, 0.6); border: 1px solid rgba(239, 68, 68, 0.18); }
+.contactIcon { width: 44px; height: 44px; border-radius: 9999px; display: grid; place-items: center; background: rgba(220, 38, 38, 0.18); color: #f87171; flex-shrink: 0; }
+.contactName { font-size: 15px; font-weight: 700; color: #fff; }
+.contactSub { font-size: 12.5px; color: rgba(255,255,255,0.6); }
+.callBtn { width: 44px; height: 44px; border-radius: 9999px; display: grid; place-items: center; background: rgba(220, 38, 38, 0.9); color: #fff; flex-shrink: 0; }
+.callBtn:disabled { opacity: 0.4; }

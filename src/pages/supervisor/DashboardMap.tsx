@@ -14,6 +14,7 @@ import brandLogo from "@/assets/brand-logo.png";
 import { NavActions } from "@/components/shared/NavActions";
 import { openAppMenu } from "@/components/shared/SideMenu";
 import StationsMap, { type MapStation, type StationStatus } from "@/components/StationsMap";
+import { RouteStartCard } from "./RouteStartCard";
 import { supervisorRoute } from "@/lib/supervisorRoute";
 import { stationService, guardsService } from "@/lib/services";
 import { useAuth } from "@/context/AuthContext";
@@ -71,7 +72,7 @@ function Avatar() {
   const { user } = useAuth();
   const src = useFileUrl((user as any)?.avatars?.[0] || null);
   return (
-    <span className="relative grid h-9 w-9 place-items-center overflow-hidden rounded-full bg-surface-2 text-muted ring-1 ring-line">
+    <span className="relative grid h-11 w-11 place-items-center overflow-hidden rounded-full bg-surface-2 text-muted ring-1 ring-line">
       {src ? (
         // eslint-disable-next-line jsx-a11y/alt-text
         <img src={src} className="h-full w-full object-cover" />
@@ -110,7 +111,7 @@ function StatCard({
       style={active ? { boxShadow: `0 0 0 2px ${tint}, 0 8px 22px -10px rgba(15,23,42,.28)` } : undefined}
     >
       <span
-        className="grid h-9 w-9 place-items-center rounded-[11px]"
+        className="grid h-11 w-11 place-items-center rounded-[11px]"
         style={{ background: `${tint}1f`, color: tint }}
       >
         {icon}
@@ -209,7 +210,7 @@ export default function DashboardMap() {
                 type="button"
                 aria-label={t("nav.menu", "Menú")}
                 onClick={() => { fb.tap(); openAppMenu(); }}
-                className="pressable grid h-9 w-9 shrink-0 place-items-center rounded-full text-ink active:bg-black/5"
+                className="pressable grid h-11 w-11 shrink-0 place-items-center rounded-full text-ink active:bg-black/5"
               >
                 <Menu size={22} />
               </button>
@@ -275,6 +276,9 @@ export default function DashboardMap() {
               />
             </div>
           </div>
+
+          {/* Route mission entry — floats above the tab bar. */}
+          <RouteStartCard />
 
           {/* Hidden refresh affordance: tapping the logo area reloads (pull-to-
               refresh is disabled on the non-scrolling map page). */}

@@ -1,0 +1,76 @@
+/* Component-scoped styles for StationMap.tsx (satellite geofence map). */
+
+.wrap {
+  position: relative;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+.wrap :global(.leaflet-container) {
+  background: #0b0c0e;
+  font: inherit;
+}
+
+/* Central building marker. */
+.stationMarker {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, #0b0c0e 78%, transparent);
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 0 4px rgba(212, 160, 23, 0.18), 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Geofence vertex + checkpoint node. */
+.checkpoint {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: var(--gold);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Station name label under the marker (Leaflet tooltip). */
+.stationLabel {
+  background: rgba(17, 20, 26, 0.9) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 3px 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5) !important;
+}
+.stationLabel :global(.leaflet-tooltip-tip) {
+  display: none;
+}
+
+/* Floating controls, right side. */
+.controls {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+.ctrl {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 0.9rem;
+  background: color-mix(in srgb, #0b0c0e 62%, transparent);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  transition: transform 0.12s ease;
+}
+.ctrl:active {
+  transform: scale(0.92);
+}

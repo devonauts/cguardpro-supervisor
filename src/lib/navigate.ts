@@ -48,4 +48,33 @@ export function openNativeNavigation(
   }
 }
 
+/**
+ * Open the device's maps app with directions to a text ADDRESS (not coords).
+ * Used by the dashboard station-pin popup — the destination is the station's
+ * postal address, resolved by the maps app itself.
+ */
+export function openAddressNavigation(address: string): void {
+  const q = encodeURIComponent(address);
+  try {
+    let url: string;
+    if (isPlatform("ios")) {
+      url = `maps://?daddr=${q}`;
+    } else if (isPlatform("android")) {
+      url = `geo:0,0?q=${q}`;
+    } else {
+      url = `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+    }
+    const win = window.open(url, "_system");
+    if (!win) {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${q}`, "_blank");
+    }
+  } catch {
+    try {
+      window.open(`https://www.google.com/maps/dir/?api=1&destination=${q}`, "_blank");
+    } catch {
+      /* best-effort */
+    }
+  }
+}
+
 export default openNativeNavigation;

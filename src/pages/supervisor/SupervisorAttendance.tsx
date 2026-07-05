@@ -68,13 +68,13 @@ export default function SupervisorAttendance() {
             <button
               disabled={!!busy}
               onClick={() => act(`ok-${r.id}`, () => kind === "in" ? supervisorRoute.attendanceDecideClockIn(r.id, "approved") : supervisorRoute.attendanceDecideClockOut(r.id, "approved"), t("attendance.approved", "Aprobado"))}
-              className="grid h-9 w-9 place-items-center rounded-lg bg-online/15 text-online"
+              className="grid h-11 w-11 place-items-center rounded-lg bg-online/15 text-online"
               aria-label={t("attendance.approve", "Aprobar")}
             ><Check size={18} /></button>
             <button
               disabled={!!busy}
               onClick={() => act(`no-${r.id}`, () => kind === "in" ? supervisorRoute.attendanceDecideClockIn(r.id, "rejected") : supervisorRoute.attendanceDecideClockOut(r.id, "rejected"), t("attendance.rejected", "Rechazado"))}
-              className="grid h-9 w-9 place-items-center rounded-lg bg-critical/15 text-critical"
+              className="grid h-11 w-11 place-items-center rounded-lg bg-critical/15 text-critical"
               aria-label={t("attendance.reject", "Rechazar")}
             ><X size={18} /></button>
           </div>

@@ -1,0 +1,73 @@
+/* Component-scoped styles for SupervisorRadio.tsx. */
+
+.tabs { display: flex; gap: 1.9rem; overflow-x: auto; border-bottom: 1px solid var(--line); padding: 0.5rem 1.15rem 0; }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { position: relative; flex-shrink: 0; padding: 0.65rem 0.15rem 0.85rem; font-size: 15px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.tabActive { color: var(--gold); }
+.tabActive::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 9999px; background: var(--gold); }
+
+/* Channel selector */
+.chScroll { display: flex; gap: 0.75rem; overflow-x: auto; padding: 0 1rem; }
+.chScroll::-webkit-scrollbar { display: none; }
+.chCard {
+  flex-shrink: 0; width: 104px; min-height: 104px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.4rem;
+  border-radius: 1rem; border: 1px solid var(--line); background: var(--surface-elev);
+  color: var(--muted); text-align: center; padding: 0.75rem 0.4rem;
+}
+.chCardActive { border-color: var(--gold); }
+.chName { font-size: 13px; font-weight: 700; }
+.chOnline { font-size: 12px; font-weight: 600; color: var(--online); }
+.chOffline { font-size: 12px; color: var(--muted); }
+
+/* Active channel panel */
+.panel { border-radius: 1.25rem; border: 1px solid var(--line); background: var(--surface-elev); padding: 1.25rem; }
+.hex { width: 56px; height: 56px; border-radius: 14px; display: grid; place-items: center; border: 1.5px solid var(--gold); color: var(--gold); }
+.panelTitle { font-size: 22px; font-weight: 800; color: var(--ink); }
+.membersOnline { display: flex; align-items: center; gap: 0.4rem; font-size: 14px; color: var(--muted); margin-top: 0.15rem; }
+.panelIconBtn { width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; background: var(--surface-2); color: var(--muted); font-size: 11px; }
+.desc { font-size: 14px; color: var(--muted); margin-top: 0.9rem; }
+
+/* PTT */
+.pttWrap { position: relative; flex-shrink: 0; display: grid; place-items: center; margin: 1.25rem 0; }
+.pttBtn {
+  position: relative; flex-shrink: 0;
+  width: min(184px, 46vw); height: auto; aspect-ratio: 1 / 1; border-radius: 50%;
+  display: grid; place-items: center;
+  background: radial-gradient(circle at 50% 45%, #23262e, #14161b);
+  border: 3px solid var(--gold);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold) 10%, transparent), 0 0 60px -6px color-mix(in srgb, var(--gold) 55%, transparent);
+  color: var(--gold);
+  touch-action: none; user-select: none; -webkit-user-select: none;
+}
+.pttBtn:disabled { opacity: 0.55; }
+.pttTalking { border-color: var(--critical); color: #fff; box-shadow: 0 0 0 6px color-mix(in srgb, var(--critical) 18%, transparent), 0 0 70px -4px color-mix(in srgb, var(--critical) 60%, transparent); }
+.pttLabel { font-size: 18px; font-weight: 800; color: var(--gold); margin-top: 0.4rem; }
+.pttHint { font-size: 13px; color: var(--muted); }
+.sideBtn { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
+.sideCircle { width: 52px; height: 52px; flex-shrink: 0; border-radius: 9999px; display: grid; place-items: center; background: var(--surface-2); border: 1px solid var(--line); color: var(--muted); }
+.sideCircleOn { background: color-mix(in srgb, var(--gold) 16%, transparent); border-color: var(--gold); color: var(--gold); }
+.sideLabel { font-size: 12px; color: var(--muted); }
+
+/* Transmissions */
+.tx { display: flex; align-items: center; gap: 0.75rem; border-radius: 1rem; border: 1px solid var(--line); background: var(--surface-elev); padding: 0.9rem; }
+.txAvatar { position: relative; width: 44px; height: 44px; flex-shrink: 0; }
+.txAvatarImg { width: 100%; height: 100%; border-radius: 9999px; object-fit: cover; background: var(--surface-2); display: grid; place-items: center; color: var(--muted); }
+.txDot { position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; border-radius: 9999px; border: 2px solid var(--surface-elev); background: var(--online); }
+.txName { font-size: 15px; font-weight: 700; color: var(--ink); }
+.txText { font-size: 13px; color: var(--muted); }
+.txMeta { font-size: 12px; color: var(--muted); }
+.txPlay { width: 40px; height: 40px; border-radius: 9999px; border: 1px solid var(--line); display: grid; place-items: center; color: var(--muted); }
+
+/* Mini player */
+.mini {
+  position: sticky; bottom: 0; z-index: 20;
+  display: flex; align-items: center; gap: 0.75rem;
+  margin: 0.5rem 0 0; padding: 0.75rem 1rem;
+  border-radius: 1rem; border: 1px solid var(--line);
+  background: color-mix(in srgb, var(--surface-elev) 92%, transparent);
+  backdrop-filter: blur(10px);
+}
+.miniHex { width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; border: 1.5px solid var(--gold); color: var(--gold); flex-shrink: 0; }
+.miniSpeaking { font-size: 12px; color: var(--online); font-weight: 600; }
+.miniHang { width: 46px; height: 46px; border-radius: 9999px; display: grid; place-items: center; background: var(--critical); color: #fff; flex-shrink: 0; }

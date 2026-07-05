@@ -1,0 +1,68 @@
+/* Component-scoped styles for IncidentDetail.tsx. */
+
+.card { border-radius: 1rem; border: 1px solid var(--line); background: var(--surface-elev); }
+.cardTitle { font-size: 15px; font-weight: 800; color: var(--ink); }
+
+/* Hero */
+.heroPhoto { width: 108px; align-self: stretch; min-height: 128px; flex-shrink: 0; border-radius: 0.875rem; overflow: hidden; background: var(--surface-2); }
+.heroPhoto img { width: 100%; height: 100%; object-fit: cover; }
+.heroPhotoPh { display: grid; place-items: center; width: 100%; height: 100%; color: var(--muted); }
+.badge { display: inline-flex; align-items: center; padding: 0.15rem 0.6rem; border-radius: 0.45rem; font-size: 11px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; }
+.title { font-size: 21px; font-weight: 800; color: var(--ink); line-height: 1.15; margin: 0.35rem 0 0.4rem; }
+.addr { font-size: 13px; color: var(--muted); }
+.metaLine { display: flex; align-items: center; gap: 0.9rem; font-size: 13px; color: var(--muted); }
+.sevDots { display: flex; gap: 5px; }
+.dot { width: 9px; height: 9px; border-radius: 9999px; background: var(--line-2); }
+.reporter { display: flex; align-items: center; gap: 0.5rem; }
+.reporterAvatar { width: 34px; height: 34px; border-radius: 9999px; object-fit: cover; background: var(--surface-2); display: grid; place-items: center; color: var(--muted); }
+
+/* Info strip */
+.infoStrip { display: flex; }
+.infoCol { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 0.2rem; padding: 0 0.6rem; }
+.infoCol + .infoCol { border-left: 1px solid var(--line); }
+.infoTop { display: flex; align-items: center; gap: 0.35rem; }
+.infoLabel { font-size: 11px; color: var(--muted); }
+.infoVal { font-size: 13px; font-weight: 700; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.infoSub { font-size: 11px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Tabs */
+.tabs { display: flex; gap: 1.1rem; overflow-x: auto; border-bottom: 1px solid var(--line); }
+.tabs::-webkit-scrollbar { display: none; }
+.tab { position: relative; flex-shrink: 0; display: flex; align-items: center; gap: 0.35rem; padding: 0.5rem 0.1rem 0.7rem; font-size: 13px; font-weight: 600; color: var(--muted); white-space: nowrap; }
+.tabActive { color: var(--gold); }
+.tabActive::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; border-radius: 9999px; background: var(--gold); }
+
+/* Timeline */
+.tlItem { display: flex; gap: 0.75rem; }
+.tlLeft { display: flex; flex-direction: column; align-items: center; }
+.tlNode { width: 34px; height: 34px; border-radius: 9999px; display: grid; place-items: center; color: #fff; flex-shrink: 0; }
+.tlLine { flex: 1; width: 2px; margin: 3px 0; border-radius: 2px; background: var(--line); min-height: 12px; }
+.tlBody { flex: 1; min-width: 0; padding-bottom: 1.1rem; }
+.tlTitle { font-size: 15px; font-weight: 700; color: var(--ink); }
+.tlText { font-size: 13px; color: var(--muted); margin-top: 0.1rem; }
+.tlTime { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.tlLink { font-size: 13px; font-weight: 700; color: var(--info); }
+.tlPhotos { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+.tlThumb { width: 60px; height: 44px; border-radius: 0.5rem; overflow: hidden; background: var(--surface-2); }
+.tlThumb img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Location + summary */
+.getDir { font-size: 13px; font-weight: 700; color: var(--info); }
+.sumText { font-size: 14px; line-height: 1.55; color: var(--ink); opacity: 0.9; }
+.sumRow { display: flex; align-items: center; justify-content: space-between; padding: 0.7rem 0; border-top: 1px solid var(--line); }
+.sumLabel { font-size: 13px; color: var(--muted); }
+.sumVal { font-size: 13px; font-weight: 700; color: var(--ink); }
+
+/* Actions */
+.actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.6rem; }
+.actBtn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.35rem; min-height: 62px; border-radius: 0.9rem; font-size: 12px; font-weight: 700; border: 1px solid transparent; }
+.actEscalate { background: color-mix(in srgb, var(--critical) 90%, black 0%); color: #fff; }
+.actNote { background: var(--info); color: #fff; }
+.actReassign { background: var(--surface); color: var(--ink); border-color: var(--line); }
+.actResolve { background: color-mix(in srgb, var(--online) 16%, transparent); color: var(--online); border-color: color-mix(in srgb, var(--online) 45%, transparent); }
+
+/* Add-note sheet */
+.noteInput { width: 100%; min-height: 108px; padding: 0.9rem 1rem; border-radius: 0.875rem; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); font-size: 15px; resize: none; }
+.noteInput::placeholder { color: var(--muted); }
+.submitBtn { width: 100%; min-height: 3.25rem; border-radius: 0.875rem; background: var(--gold); color: var(--on-accent); font-size: 16px; font-weight: 700; }
+.submitBtn:disabled { opacity: 0.5; }
