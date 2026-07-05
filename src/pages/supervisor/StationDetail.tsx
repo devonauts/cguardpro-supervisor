@@ -226,42 +226,47 @@ export default function StationDetail() {
     <Screen title={t("stationDetail.title", "Detalle de estación")} right={right} onRefresh={reload}>
       {/* Hero */}
       <div className="card-elev overflow-hidden rounded-2xl">
-        <div className="flex items-start gap-3 p-4">
-          {photo ? (
-            // eslint-disable-next-line jsx-a11y/alt-text
-            <img src={photo} className={styles.heroPhoto} />
-          ) : (
-            <span className={`${styles.heroPhoto} grid place-items-center`}><Building2 size={28} className="text-muted" /></span>
-          )}
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <p className="truncate text-[19px] font-bold text-ink">{s.name}</p>
-              <StatusPill status={s.status} t={t} />
-            </div>
-            <div className="mt-1 flex items-start gap-1 text-[13px] text-ink/85">
-              <MapPin size={14} className="mt-0.5 shrink-0 text-gold" />
-              <span>{s.address || t("stations.noAddress", "Sin dirección")}</span>
-            </div>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {s.serviceType && <span className={styles.tag}>{s.serviceType}</span>}
-              {s.priority === "high" && (
-                <span className={`${styles.tag} ${styles.tagDanger}`}>{t("stationDetail.highPriority", "Alta prioridad")}</span>
-              )}
-            </div>
-          </div>
-          <div className="flex shrink-0 flex-col gap-3">
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={18} className={riskMeta[s.riskLevel] || "text-muted"} />
-              <div>
-                <p className={styles.infoLabel}>{t("stationDetail.riskLevel", "Nivel de riesgo")}</p>
-                <p className={`text-[14px] font-bold ${riskMeta[s.riskLevel] || "text-ink"}`}>{String(t(`stationDetail.risk_${s.riskLevel}`, s.riskLevel))}</p>
+        <div className="p-4">
+          <div className="flex items-start gap-3">
+            {photo ? (
+              // eslint-disable-next-line jsx-a11y/alt-text
+              <img src={photo} className={styles.heroPhoto} />
+            ) : (
+              <span className={`${styles.heroPhoto} grid place-items-center`}><Building2 size={26} className="text-muted" /></span>
+            )}
+            <div className="min-w-0 flex-1">
+              <div className="flex items-start gap-2">
+                <p className="min-w-0 flex-1 text-[19px] font-bold leading-snug text-ink">{s.name}</p>
+                <span className="mt-0.5 shrink-0"><StatusPill status={s.status} t={t} /></span>
+              </div>
+              <div className="mt-1 flex items-start gap-1 text-[13px] text-ink/85">
+                <MapPin size={14} className="mt-0.5 shrink-0 text-gold" />
+                <span className="min-w-0">{s.address || t("stations.noAddress", "Sin dirección")}</span>
+              </div>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {s.serviceType && <span className={styles.tag}>{s.serviceType}</span>}
+                {s.priority === "high" && (
+                  <span className={`${styles.tag} ${styles.tagDanger}`}>{t("stationDetail.highPriority", "Alta prioridad")}</span>
+                )}
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Clock size={18} className="text-gold" />
-              <div>
+          </div>
+
+          {/* Risk + ETA — own full-width row so they never squeeze the name */}
+          <div className="mt-3 flex items-stretch gap-3 rounded-xl border border-line bg-surface-2/40 px-3.5 py-2.5">
+            <div className="flex flex-1 items-center gap-2">
+              <ShieldCheck size={18} className={`shrink-0 ${riskMeta[s.riskLevel] || "text-muted"}`} />
+              <div className="min-w-0">
+                <p className={styles.infoLabel}>{t("stationDetail.riskLevel", "Nivel de riesgo")}</p>
+                <p className={`truncate text-[14px] font-bold ${riskMeta[s.riskLevel] || "text-ink"}`}>{String(t(`stationDetail.risk_${s.riskLevel}`, s.riskLevel))}</p>
+              </div>
+            </div>
+            <div className="w-px shrink-0 bg-line" />
+            <div className="flex flex-1 items-center gap-2">
+              <Clock size={18} className="shrink-0 text-gold" />
+              <div className="min-w-0">
                 <p className={styles.infoLabel}>{t("stations.eta", "ETA supervisor")}</p>
-                <p className="text-[14px] font-bold text-gold">{eta == null ? "—" : t("stations.minShort", "{{n}} min", { n: eta })}</p>
+                <p className="truncate text-[14px] font-bold text-gold">{eta == null ? "—" : t("stations.minShort", "{{n}} min", { n: eta })}</p>
               </div>
             </div>
           </div>
