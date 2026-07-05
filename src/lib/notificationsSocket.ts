@@ -34,28 +34,47 @@ export function connectNotifications(
   }
   if (!token || !tenantId) return noop;
 
-  let socket: Socket;
-  try {
-    socket = io(apiOrigin, {
-      path: "/api/socket.io",
-      transports: ["websocket"],
-      auth: { token, tenantId },
-      reconnection: true,
-    });
-  } catch {
-    return noop;
-  }
+  // Defer the actual connection one tick. React StrictMode (and rapid auth
+  // flips) run mount → cleanup → mount synchronously; deferring lets a
+  // synchronous cleanup cancel the pending connect BEFORE the WebSocket
+  // handshake starts, avoiding "WebSocket is closed before the connection is
+  // established" (calling disconnect() on a still-CONNECTING socket).
+  let socket: Socket | null = null;
+  let cancelled = false;
 
-  socket.on("notification", (ev: PlatformEvent) => {
+  const timer = setTimeout(() => {
+    if (cancelled) return;
     try {
-      if (ev && ev.id) onNotification(ev);
-    } catch (e) {
-      console.warn("notification handler failed", e);
+      socket = io(apiOrigin, {
+        path: "/api/socket.io",
+        transports: ["websocket"],
+        auth: { token, tenantId },
+        reconnection: true,
+      });
+    } catch {
+      return;
     }
-  });
+    socket.on("notification", (ev: PlatformEvent) => {
+      try {
+        if (ev && ev.id) onNotification(ev);
+      } catch (e) {
+        console.warn("notification handler failed", e);
+      }
+    });
+    // Keep transient connect failures out of the console as hard errors —
+    // socket.io retries automatically.
+    socket.on("connect_error", (e: any) => {
+      console.debug("[notifications] socket connect_error:", e?.message || e);
+    });
+  }, 60);
 
   return () => {
-    try { socket.removeAllListeners(); } catch { /* ignore */ }
-    try { socket.disconnect(); } catch { /* ignore */ }
+    cancelled = true;
+    clearTimeout(timer);
+    if (socket) {
+      try { socket.removeAllListeners(); } catch { /* ignore */ }
+      try { socket.disconnect(); } catch { /* ignore */ }
+      socket = null;
+    }
   };
 }

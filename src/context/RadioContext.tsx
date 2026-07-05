@@ -97,34 +97,43 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const vc = new VoiceChannel();
-    vcRef.current = vc;
-    vc.connect(
-      { url: apiOrigin, path: "/api/socket.io", token: getToken() || "", tenantId: getTenantId(), selfId: myId },
-      { onState: setState, onPresence: setRoster, onSpeaker: setSpeaker, onError: (m) => setHint(m) },
-    );
-    // Keep the app alive in the background (iOS suspends a backgrounded WebView,
-    // which would freeze the socket + Web Audio). The native silent loop holds the
-    // process running so the radio keeps receiving when the guard is in another
-    // app or the screen is locked. Runs only while connected (on duty).
-    startBackgroundAudio();
-
     let alive = true;
+    let vc: VoiceChannel | null = null;
     let id: ReturnType<typeof setInterval> | null = null;
-    const tryJoin = () => {
-      vc.join()
-        .then(({ roster, speaker }) => {
-          if (alive) { setRoster(roster); setSpeaker(speaker); }
-          if (id !== null) { clearInterval(id); id = null; }
-        })
-        .catch(() => {});
-    };
-    id = setInterval(() => { if (vc.connected && !vc.joined) tryJoin(); }, 400);
+
+    // Defer connect a tick so a synchronous cleanup (React StrictMode double-
+    // mount, or a rapid duty toggle) cancels it BEFORE the WS handshake starts —
+    // avoids "WebSocket is closed before the connection is established".
+    const timer = setTimeout(() => {
+      if (!alive) return;
+      vc = new VoiceChannel();
+      vcRef.current = vc;
+      vc.connect(
+        { url: apiOrigin, path: "/api/socket.io", token: getToken() || "", tenantId: getTenantId(), selfId: myId },
+        { onState: setState, onPresence: setRoster, onSpeaker: setSpeaker, onError: (m) => setHint(m) },
+      );
+      // Keep the app alive in the background (iOS suspends a backgrounded WebView,
+      // which would freeze the socket + Web Audio). The native silent loop holds the
+      // process running so the radio keeps receiving when the guard is in another
+      // app or the screen is locked. Runs only while connected (on duty).
+      startBackgroundAudio();
+
+      const tryJoin = () => {
+        vc!.join()
+          .then(({ roster, speaker }) => {
+            if (alive) { setRoster(roster); setSpeaker(speaker); }
+            if (id !== null) { clearInterval(id); id = null; }
+          })
+          .catch(() => {});
+      };
+      id = setInterval(() => { if (vc!.connected && !vc!.joined) tryJoin(); }, 400);
+    }, 60);
 
     return () => {
       alive = false;
+      clearTimeout(timer);
       if (id !== null) clearInterval(id);
-      try { vc.disconnect(); } catch { /* ignore */ }
+      try { vc?.disconnect(); } catch { /* ignore */ }
       stopBackgroundAudio();
       vcRef.current = null;
     };
