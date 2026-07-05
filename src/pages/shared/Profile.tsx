@@ -48,6 +48,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useTheme } from "@/context/ThemeContext";
 import { useAsync } from "@/lib/useAsync";
 import { guardService } from "@/lib/services";
+import { supervisorRoute, isSupervisorClockedIn } from "@/lib/supervisorRoute";
 import { useFileUrl } from "@/lib/fileUrl";
 import { loadGuardPerformance, Performance } from "@/lib/performance";
 import { SUPERVISOR_ROLE } from "@/lib/roles";
@@ -75,15 +76,24 @@ export default function Profile() {
   const { theme, setTheme } = useTheme();
   const history = useHistory();
 
+  const isSupervisor = role === SUPERVISOR_ROLE;
+
   // Real profile + station data.
   const { data, reload } = useAsync(() => guardService.dashboard().catch(() => null));
   const { data: perf, reload: reloadPerf } = useAsync<Performance | null>(() =>
     loadGuardPerformance(30).catch(() => null),
   );
+  // Supervisors have no guard dashboard/clock — their duty status lives in the
+  // supervisorShift clock. Fetch it so the on-duty dot/pill is correct for them.
+  const { data: supClock } = useAsync(() =>
+    isSupervisor ? supervisorRoute.clockStatus().catch(() => null) : Promise.resolve(null),
+  );
 
   const guard = (data as any)?.guard || {};
   const stations: any[] = (data as any)?.stations || [];
-  const isClockedIn = !!(data as any)?.isClockedIn;
+  const isClockedIn = isSupervisor
+    ? isSupervisorClockedIn(supClock)
+    : !!(data as any)?.isClockedIn;
   const station = stations[0] || {};
 
   const name = guard.fullName || user?.fullName || user?.name || user?.email || "—";
@@ -101,7 +111,6 @@ export default function Profile() {
   const avatarSrc = useFileUrl(avatarSource) || null;
   const email = guard.email || user?.email || "—";
   const phone = guard.phone || "—";
-  const isSupervisor = role === SUPERVISOR_ROLE;
   const roleLabel = isSupervisor
     ? t("profile.roleSupervisor", "Supervisor de Seguridad")
     : t("profile.roleGuard", "Oficial de Seguridad");
@@ -384,22 +393,24 @@ export default function Profile() {
               icon={<CalendarDays size={18} />}
               title={t("nav.schedule", "Horario")}
               subtitle={t("profile.scheduleSub", "Tus próximos turnos")}
-              onClick={() => history.push("/guard/schedule")}
+              onClick={() => history.push(isSupervisor ? "/supervisor/schedule" : "/guard/schedule")}
             />
             <MenuRow
               tone="amber"
               icon={<Bell size={18} />}
               title={t("nav.notices", "Avisos")}
               subtitle={t("profile.noticesSub", "Memos y comunicados")}
-              onClick={() => history.push("/guard/notices")}
+              onClick={() => history.push(isSupervisor ? "/supervisor/notifications" : "/guard/notices")}
             />
-            <MenuRow
-              tone="purple"
-              icon={<CalendarOff size={18} />}
-              title={t("profile.timeOff", "Tiempo libre")}
-              subtitle={t("profile.timeOffSub", "Saldo y solicitudes")}
-              onClick={() => history.push("/guard/time-off")}
-            />
+            {!isSupervisor && (
+              <MenuRow
+                tone="purple"
+                icon={<CalendarOff size={18} />}
+                title={t("profile.timeOff", "Tiempo libre")}
+                subtitle={t("profile.timeOffSub", "Saldo y solicitudes")}
+                onClick={() => history.push("/guard/time-off")}
+              />
+            )}
           </MenuList>
         </div>
 
@@ -407,13 +418,15 @@ export default function Profile() {
         <div>
           <SectionHeader title={t("profile.groupDevice", "Dispositivo y app")} />
           <MenuList>
-            <MenuRow
-              tone="green"
-              icon={<ShieldCheck size={18} />}
-              title={t("profile.permissions", "Permisos del dispositivo")}
-              subtitle={t("profile.permissionsSub", "Ubicación, cámara y notificaciones")}
-              onClick={() => history.push("/guard/permissions")}
-            />
+            {!isSupervisor && (
+              <MenuRow
+                tone="green"
+                icon={<ShieldCheck size={18} />}
+                title={t("profile.permissions", "Permisos del dispositivo")}
+                subtitle={t("profile.permissionsSub", "Ubicación, cámara y notificaciones")}
+                onClick={() => history.push("/guard/permissions")}
+              />
+            )}
             <MenuRow
               tone="blue"
               icon={<Globe size={18} />}

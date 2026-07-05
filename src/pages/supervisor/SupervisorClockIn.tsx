@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import {
@@ -22,6 +22,7 @@ import {
 import { Button, StatusPill } from "@/components/ui/kit";
 import { useAsync } from "@/lib/useAsync";
 import { supervisorRoute } from "@/lib/supervisorRoute";
+import { setDuty } from "@/lib/dutyState";
 import { getCurrentPosition } from "@/lib/geo";
 import {
   compressImage,
@@ -77,6 +78,12 @@ export default function SupervisorClockIn() {
   );
   const clockedIn = isClockedIn(data);
   const since = startedAtOf(data);
+
+  // Keep the shared duty state (which gates the radio mic) in sync with the
+  // real clock status whenever it loads/refreshes.
+  useEffect(() => {
+    setDuty(clockedIn);
+  }, [clockedIn]);
 
   // ── Submit state (shared by clock-in and clock-out) ─────────────────────
   const [busy, setBusy] = useState(false);
@@ -153,6 +160,7 @@ export default function SupervisorClockIn() {
       }
 
       await supervisorRoute.clockIn({ latitude, longitude, selfiePhoto });
+      setDuty(true); // enable the radio mic immediately on clock-in
       fb.success();
       setResult("in");
     } catch (e: any) {
@@ -187,6 +195,7 @@ export default function SupervisorClockIn() {
         longitude,
         observations: observations.trim() || undefined,
       });
+      setDuty(false); // disconnect the radio on clock-out
       fb.success();
       setResult("out");
     } catch (e: any) {

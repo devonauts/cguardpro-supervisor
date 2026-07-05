@@ -11,7 +11,8 @@ import { apiOrigin, getToken, getTenantId } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import { VoiceChannel, type VoiceMember, type VoiceSpeaker, type VoiceState } from "@/lib/voiceChannel";
 import { ensureMicPermission } from "@/lib/micPermission";
-import { getDuty, subscribeDuty } from "@/lib/dutyState";
+import { getDuty, subscribeDuty, setDuty } from "@/lib/dutyState";
+import { supervisorRoute, isSupervisorClockedIn } from "@/lib/supervisorRoute";
 import { startBackgroundAudio, stopBackgroundAudio } from "@/lib/backgroundAudio";
 import { App as CapApp } from "@capacitor/app";
 
@@ -64,6 +65,20 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     setOnDuty(getDuty());
     return subscribeDuty((v) => setOnDuty(v));
   }, []);
+
+  // Boot reconcile: the supervisor's true on-duty state lives in supervisorShift
+  // (their clock-in), NOT in the guard `guard.onDuty` flag. Without this, duty
+  // stays whatever localStorage last held (usually false), so the radio mic is
+  // permanently disabled. Fetch the real clock status once and publish it.
+  useEffect(() => {
+    if (!myId) return;
+    let cancelled = false;
+    supervisorRoute
+      .clockStatus()
+      .then((s) => { if (!cancelled) setDuty(isSupervisorClockedIn(s)); })
+      .catch(() => { /* leave whatever duty state is persisted */ });
+    return () => { cancelled = true; };
+  }, [myId]);
 
   // Connect + join while on duty; tear everything down off duty.
   useEffect(() => {
