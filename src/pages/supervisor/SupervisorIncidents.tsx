@@ -217,7 +217,7 @@ export default function SupervisorIncidents() {
             </div>
 
             {/* List */}
-            <div className={`px-4 pb-28 ${view === "grid" ? "grid grid-cols-1 gap-3" : "space-y-3"}`}>
+            <div className={`px-4 pb-28 stagger ${view === "grid" ? "grid grid-cols-1 gap-3" : "space-y-3"}`}>
               {shown.length === 0 ? (
                 <div className="mt-16 flex flex-col items-center gap-2 text-center">
                   <ShieldAlert size={30} className="text-faint" />

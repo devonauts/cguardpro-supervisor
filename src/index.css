@@ -110,6 +110,19 @@ body {
   }
 }
 
+/* ── Theme cross-fade ──────────────────────────────────────────────────────
+   ThemeContext adds `.theme-animating` to <html> for ~360ms on a light/dark
+   toggle, so the whole UI eases between palettes instead of snapping. Scoped to
+   the toggle window (not permanent) so normal taps/hovers stay instant, and
+   gated on no-preference so motion-sensitive users still get an instant flip. */
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-animating,
+  html.theme-animating * {
+    transition: background-color 300ms ease, border-color 300ms ease,
+      color 300ms ease, fill 300ms ease, box-shadow 300ms ease !important;
+  }
+}
+
 /* ── Entrance transitions ──────────────────────────────────────────────────
    Reusable so content eases in instead of blinking. `.animate-in` for a single
    block that swaps in (loaded data replacing a skeleton); `.stagger` on a list

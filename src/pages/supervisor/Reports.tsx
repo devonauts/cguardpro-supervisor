@@ -165,7 +165,7 @@ export default function Reports() {
             <button type="button" className={styles.exportBtn} onClick={() => present({ message: t("guardDetail.soon", "Próximamente"), duration: 1200, position: "top" })}><Download size={16} />{t("reports.export", "Exportar")}</button>
           </div>
 
-          <div className="space-y-4 px-4">
+          <div className="space-y-4 px-4 stagger">
             {chartsVisible && show(["incidents"]) && (
               <TrendCard icon={<Clock size={18} />} tint="#ef4444" title={t("reports.lateArrivals", "Llegadas tarde")} value={stats?.lateArrivals?.value ?? 0} sub={t("reports.lateArrivalsSub", "llegadas tarde")} series={series.lateArrivals} gradId="gLate" />
             )}

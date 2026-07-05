@@ -151,7 +151,7 @@ export default function SupervisorVisitors() {
               ))}
             </div>
 
-            <div className="space-y-3 px-4 pb-28 pt-4">
+            <div className="space-y-3 px-4 pb-28 pt-4 stagger">
               {shown.length === 0 ? (
                 <div className="mt-16 flex flex-col items-center gap-2 text-center">
                   <Users size={30} className="text-faint" />

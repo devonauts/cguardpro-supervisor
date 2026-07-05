@@ -186,7 +186,7 @@ export default function SupervisorMessages() {
       ) : error && rows.length === 0 ? (
         <div className="px-4 pt-8"><ErrorState onRetry={reload} /></div>
       ) : (
-        <div className="mt-3 pb-24">
+        <div className="mt-3 pb-24 stagger">
           {shown.length === 0 ? (
             <div className="mt-16 flex flex-col items-center gap-2 text-center">
               <MessageSquare size={30} className="text-faint" />

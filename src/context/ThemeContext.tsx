@@ -4,6 +4,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   ReactNode,
 } from "react";
@@ -55,6 +56,7 @@ export function applyThemeClass(theme: Theme): void {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => getStoredTheme());
 
+  const firstRun = useRef(true);
   // Keep the DOM class + storage in sync whenever the theme changes.
   useEffect(() => {
     applyThemeClass(theme);
@@ -63,6 +65,14 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch {
       /* storage unavailable — class is still applied for this session */
     }
+    // Smooth color cross-fade on a user toggle (not on the initial mount). The
+    // `theme-animating` class enables a brief color transition, then is removed
+    // so normal interactions stay instant.
+    if (firstRun.current) { firstRun.current = false; return; }
+    const el = document.documentElement;
+    el.classList.add("theme-animating");
+    const id = window.setTimeout(() => el.classList.remove("theme-animating"), 360);
+    return () => window.clearTimeout(id);
   }, [theme]);
 
   const setTheme = useCallback((t: Theme) => setThemeState(t), []);

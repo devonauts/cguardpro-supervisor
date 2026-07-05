@@ -141,7 +141,7 @@ export default function Notifications() {
             {groups.map((g) => (
               <div key={g.label}>
                 <p className={styles.dayLabel}>{g.label}</p>
-                <div className="space-y-3">
+                <div className="space-y-3 stagger">
                   {g.items.map((n) => {
                     const m = meta(n.type);
                     const loc = locationOf(n);
