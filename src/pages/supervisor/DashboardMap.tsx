@@ -149,7 +149,10 @@ export default function DashboardMap() {
             }
           : summarize(stations);
       return { stations, summary };
-    } catch {
+    } catch (e) {
+      // Surfaces on-device in Safari Web Inspector so a failed monitor request
+      // isn't mistaken for "no stations".
+      console.warn("[dashboard] /supervisor/me/stations failed:", e);
       // Pre-deploy fallback: pins from the station list; status unknown.
       const [rows, active] = await Promise.all([
         stationService.list().catch(() => []),

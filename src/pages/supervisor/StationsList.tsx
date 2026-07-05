@@ -20,6 +20,7 @@ import {
 import brandLogo from "@/assets/brand-logo.png";
 import { NavActions } from "@/components/shared/NavActions";
 import { openAppMenu } from "@/components/shared/SideMenu";
+import { ErrorState, SkeletonList } from "@/components/ui";
 import styles from "./StationsList.module.css";
 import { supervisorRoute } from "@/lib/supervisorRoute";
 import { stationService } from "@/lib/services";
@@ -321,7 +322,7 @@ export default function StationsList() {
       .catch(() => {});
   }, []);
 
-  const { data, reload } = useAsync(async () => {
+  const { data, error, loading, reload } = useAsync(async () => {
     try {
       const res: any = await supervisorRoute.stationsList();
       const stations = normalize(res?.stations);
@@ -335,8 +336,13 @@ export default function StationsList() {
             }
           : summarize(stations);
       return { stations, summary };
-    } catch {
-      const rows = await stationService.list().catch(() => []);
+    } catch (e) {
+      // Surface the real failure (shows in Safari Web Inspector on-device) rather
+      // than silently masking it with an empty list.
+      console.warn("[stations] /supervisor/me/stations/list failed:", e);
+      const rows = await stationService
+        .list()
+        .catch((e2) => { console.warn("[stations] fallback /station failed:", e2); return []; });
       const stations = normalize(
         (Array.isArray(rows) ? rows : []).map((r: any) => ({
           id: r.id,
@@ -346,6 +352,9 @@ export default function StationsList() {
           status: "offline",
         })),
       );
+      // Nothing recovered from either endpoint → surface the error state (with a
+      // retry) instead of pretending there are simply zero stations.
+      if (stations.length === 0) throw e;
       return { stations, summary: summarize(stations) };
     }
   }, []);
@@ -416,7 +425,11 @@ export default function StationsList() {
 
         {/* Content */}
         <div className="stagger px-5 pb-28">
-          {shown.length === 0 ? (
+          {error && stations.length === 0 ? (
+            <div className="mt-14"><ErrorState onRetry={reload} /></div>
+          ) : loading && stations.length === 0 ? (
+            <div className="mt-6"><SkeletonList rows={5} /></div>
+          ) : shown.length === 0 ? (
             <div className="mt-16 flex flex-col items-center gap-2 text-center">
               <Building2 size={30} className="text-faint" />
               <p className="text-sm text-muted">{t("stations.empty", "No hay estaciones que mostrar")}</p>
