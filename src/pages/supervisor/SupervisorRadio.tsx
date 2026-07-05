@@ -29,7 +29,7 @@ function fmtTime(ms: number): string {
   return new Date(ms).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 }
 
-export default function SupervisorRadio() {
+export default function SupervisorRadio({ onClose }: { onClose?: () => void } = {}) {
   const { t } = useTranslation();
   const [present] = useIonToast();
   const { state, roster, speaker, talking, hint, myId, someoneElseTalking, onDuty, setScreenActive, resume, pressTalk, releaseTalk } = useRadio();
@@ -85,7 +85,7 @@ export default function SupervisorRadio() {
   };
 
   return (
-    <Screen largeTitle={t("nav.radio", "Radio")} right={<NavActions />} back flush onPointerDown={resume}>
+    <Screen largeTitle={t("nav.radio", "Radio")} right={onClose ? undefined : <NavActions />} onClose={onClose} back flush onPointerDown={resume}>
         {/* Tabs */}
         <div className={`${styles.tabs} mt-3`}>
           {([["channels", t("radio.tabChannels", "Canales")], ["recent", t("radio.tabRecent", "Recientes")], ["contacts", t("radio.tabContacts", "Contactos")], ["scan", t("radio.tabScan", "Escanear")]] as [Tab, string][]).map(([k, l]) => (

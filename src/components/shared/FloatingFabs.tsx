@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
 import { IonModal } from "@ionic/react";
 import { Radio as RadioIcon } from "lucide-react";
 import Emergency from "@/pages/supervisor/Emergency";
+import SupervisorRadio from "@/pages/supervisor/SupervisorRadio";
 import fb from "@/lib/feedback";
 import styles from "./FloatingFabs.module.css";
 
@@ -37,10 +37,7 @@ function clampY(y: number, h: number) {
  */
 export function FloatingFabs() {
   const { t } = useTranslation();
-  const history = useHistory();
-  const navRef = useRef(history);
-  navRef.current = history;
-  const [openKey, setOpenKey] = useState<null | "sos">(null);
+  const [openKey, setOpenKey] = useState<null | "sos" | "radio">(null);
   const elRef = useRef<HTMLDivElement>(null);
   const posRef = useRef<{ x: number; y: number }>(
     (() => {
@@ -82,8 +79,7 @@ export function FloatingFabs() {
       window.removeEventListener("pointercancel", up);
       try { el.releasePointerCapture(e.pointerId); } catch { /* ignore */ }
       if (!st.moved) {
-        if (st.key === "sos") { fb.press(); setOpenKey("sos"); }
-        else if (st.key === "radio") { fb.press(); navRef.current.push("/supervisor/radio"); }
+        if (st.key === "sos" || st.key === "radio") { fb.press(); setOpenKey(st.key); }
         return;
       }
       const snapX = posRef.current.x + SIZE / 2 < window.innerWidth / 2 ? MARGIN : window.innerWidth - SIZE - MARGIN;
@@ -146,6 +142,10 @@ export function FloatingFabs() {
 
       <IonModal isOpen={openKey === "sos"} onDidDismiss={close} breakpoints={[0, 1]} initialBreakpoint={1} handle className={styles.sheet}>
         {openKey === "sos" && <Emergency onClose={close} />}
+      </IonModal>
+
+      <IonModal isOpen={openKey === "radio"} onDidDismiss={close} breakpoints={[0, 1]} initialBreakpoint={1} handle className={styles.sheet}>
+        {openKey === "radio" && <SupervisorRadio onClose={close} />}
       </IonModal>
     </>
   );

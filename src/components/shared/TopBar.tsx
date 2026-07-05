@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, Menu } from "lucide-react";
+import { ChevronLeft, ChevronDown, Menu } from "lucide-react";
 
 /**
  * Shared navigation bar — the app's single top-bar, used by every screen through
@@ -33,6 +33,9 @@ export interface TopBarProps {
   avatar?: ReactNode;
   showBack?: boolean;
   onBack?: () => void;
+  /** Leading item is a close chevron (▼) instead of a back arrow — for screens
+   *  presented as a bottom-sheet modal (dismiss vs. navigate back). */
+  closeVariant?: boolean;
   /** Leading hamburger (root screens without a back button). */
   onMenu?: () => void;
   /** Collapse progress 0 (expanded) → 1 (collapsed). Large variant only. */
@@ -53,21 +56,22 @@ export function TopBar({
   avatar,
   showBack,
   onBack,
+  closeVariant,
   onMenu,
   progress = 0,
   elevated,
 }: TopBarProps) {
   const { t } = useTranslation();
 
-  // Leading nav-bar item: a back button on pushed pages, otherwise the hamburger
-  // (root screens) — exactly one, like an iOS navigation bar's leading item.
+  // Leading nav-bar item: a back (or close, in a sheet) button on pushed pages,
+  // otherwise the hamburger (root screens) — exactly one, like iOS's leading item.
   const leading = showBack ? (
     <button
       onClick={onBack}
-      aria-label={t("aria.back", "Atrás")}
+      aria-label={closeVariant ? t("app.close", "Cerrar") : t("aria.back", "Atrás")}
       className="pressable -ml-1 shrink-0 rounded-full p-2 text-ink active:bg-surface-2"
     >
-      <ChevronLeft size={27} />
+      {closeVariant ? <ChevronDown size={27} /> : <ChevronLeft size={27} />}
     </button>
   ) : onMenu ? (
     <button

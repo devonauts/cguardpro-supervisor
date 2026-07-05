@@ -44,6 +44,7 @@ export function Screen({
   onRefresh,
   back,
   backHref,
+  onClose,
   root,
   largeTitle,
   largeSubtitle,
@@ -63,6 +64,9 @@ export function Screen({
   onRefresh?: () => Promise<void> | void;
   back?: boolean;
   backHref?: string;
+  /** When set, the leading nav item becomes a close chevron that calls this
+   *  instead of navigating back — for screens presented as a bottom-sheet modal. */
+  onClose?: () => void;
   /**
    * Tab-root screens (the bottom-tab destinations) pass `root` to HIDE the back
    * button. Every other screen is a pushed sub-page and shows a back button by
@@ -90,8 +94,10 @@ export function Screen({
 }) {
   const history = useHistory();
   // Sub-pages show a back button by default; only tab roots opt out via `root`.
-  const showBack = back === true || !root;
+  // A modal-presented screen (`onClose`) always shows a (close) leading item.
+  const showBack = back === true || !!onClose || !root;
   const goBack = () => {
+    if (onClose) return onClose();
     if (backHref) history.push(backHref);
     else if (history.length > 1) history.goBack();
     else history.push("/supervisor/dashboard");
@@ -172,6 +178,7 @@ export function Screen({
             avatar={avatar}
             showBack={showBack}
             onBack={goBack}
+            closeVariant={!!onClose}
             progress={p}
           />
 
@@ -190,7 +197,7 @@ export function Screen({
     return (
       <IonPage>
         <IonContent className="chat-fill" forceOverscroll={false}>
-          <TopBar variant="bar" onMenu={onMenu} elevated title={title} titleClassName={titleClassName} subtitle={subtitle} right={right} showBack={showBack} onBack={goBack} />
+          <TopBar variant="bar" onMenu={onMenu} elevated title={title} titleClassName={titleClassName} subtitle={subtitle} right={right} showBack={showBack} onBack={goBack} closeVariant={!!onClose} />
           <div className="flex min-h-0 flex-1 flex-col bg-background">{children}</div>
         </IonContent>
       </IonPage>
@@ -201,7 +208,7 @@ export function Screen({
   return (
     <IonPage>
       <IonContent forceOverscroll={REFRESH_MODE === "ios"}>
-        <TopBar variant="bar" onMenu={onMenu} title={title} titleClassName={titleClassName} subtitle={subtitle} right={right} showBack={showBack} onBack={goBack} />
+        <TopBar variant="bar" onMenu={onMenu} title={title} titleClassName={titleClassName} subtitle={subtitle} right={right} showBack={showBack} onBack={goBack} closeVariant={!!onClose} />
 
         {refresher}
 
