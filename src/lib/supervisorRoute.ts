@@ -66,6 +66,12 @@ export const supervisorRoute = {
   emergency: () =>
     api.get(tenantPath("/supervisor/me/emergency")).then(unwrap),
 
+  /** Reports/analytics overview (stats + daily series + guard perf + checkpoints). */
+  reports: (params?: Record<string, string>) => {
+    const qs = params ? "?" + new URLSearchParams(params).toString() : "";
+    return api.get(tenantPath(`/supervisor/me/reports${qs}`)).then(unwrap);
+  },
+
   /** Real-time visitors across the tenant's stations + status counts. */
   visitors: () =>
     api.get(tenantPath("/supervisor/me/visitors")).then(unwrap),
@@ -111,6 +117,10 @@ export const supervisorRoute = {
   /** The supervisor's OWN upcoming turno windows (their shift, not guards'). */
   schedule: () =>
     api.get(tenantPath("/supervisor/me/schedule")).then(unwrap),
+
+  /** Acknowledge an incident dispatched to me: accepted | enRoute | onScene. */
+  respondDispatch: (incidentId: string, status: "accepted" | "enRoute" | "onScene") =>
+    api.post(tenantPath(`/supervisor/me/incidents/${incidentId}/respond`), { status }).then(unwrap),
 
   /** Clock in (selfie/vehicle/geo in body). */
   clockIn: (body?: unknown) =>
