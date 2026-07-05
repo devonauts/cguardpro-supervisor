@@ -69,7 +69,7 @@ export const rondasService = {
   /** Register this device's FCM token for push (with the stable deviceId so the
    *  token attaches to the guard's real device row, not a duplicate). */
   registerDeviceToken: (token: string, deviceId?: string | null) =>
-    api.post(tenantPath("/guard/me/device-token"), { data: { token, deviceId } }).then(unwrap),
+    api.post(tenantPath("/guard/me/device-token"), { data: { token, deviceId, app: "supervisor" } }).then(unwrap),
 
   /** Report this device's identity (deviceId + model/OS/app version) — bind/flag. */
   registerDevice: (data: Record<string, any>) =>
