@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
-import { CalendarDays, FileBarChart, User, LogOut, Shirt, LifeBuoy } from "lucide-react";
+import { CalendarDays, FileBarChart, User, LogOut, Shirt, LifeBuoy, Radio, Building2, Bell, Users2, Siren } from "lucide-react";
 import { Screen } from "@/components/Screen";
 import { Card } from "@/components/ui";
 import { Button, MenuRow, MenuList } from "@/components/ui/kit";
@@ -12,6 +12,11 @@ export default function More() {
   const { signOut, refreshUser } = useAuth();
 
   const items = [
+    { icon: <Siren size={20} />, label: t("sos.title", "Emergencia"), to: "/supervisor/emergency" },
+    { icon: <Bell size={20} />, label: t("notif.title", "Notificaciones"), to: "/supervisor/notifications" },
+    { icon: <Users2 size={20} />, label: t("visitors.title", "Visitantes"), to: "/supervisor/visitors" },
+    { icon: <Building2 size={20} />, label: t("stations.title", "Estaciones"), to: "/supervisor/stations" },
+    { icon: <Radio size={20} />, label: t("nav.radio", "Radio"), to: "/supervisor/radio" },
     { icon: <CalendarDays size={20} />, label: t("nav.schedule"), to: "/supervisor/schedule" },
     { icon: <Shirt size={20} />, label: t("uniform.title"), to: "/supervisor/uniform" },
     { icon: <LifeBuoy size={20} />, label: t("backupConfirm.title"), to: "/supervisor/backup" },

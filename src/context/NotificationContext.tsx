@@ -31,6 +31,8 @@ export type AppNotification = {
 interface NotificationContextType {
   items: AppNotification[];
   unreadCount: number;
+  /** The most recent realtime event — data screens watch this to live-refresh. */
+  lastEvent: AppNotification | null;
   loading: boolean;
   error: boolean;
   refresh: () => Promise<void>;
@@ -77,6 +79,7 @@ function fromRealtimeEvent(ev: PlatformEvent): AppNotification {
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   const { isAuthenticated } = useAuth();
   const [items, setItems] = useState<AppNotification[]>([]);
+  const [lastEvent, setLastEvent] = useState<AppNotification | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
 
@@ -123,9 +126,11 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     if (!isAuthenticated) return;
     const disconnect = connectNotifications((ev) => {
+      const n = fromRealtimeEvent(ev);
+      setLastEvent(n); // notify data screens so they can live-refresh
       setItems((prev) => {
-        if (prev.some((n) => n.id === ev.id)) return prev;
-        return [fromRealtimeEvent(ev), ...prev];
+        if (prev.some((x) => x.id === n.id)) return prev;
+        return [n, ...prev];
       });
     });
     return disconnect;
@@ -193,6 +198,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     () => ({
       items,
       unreadCount,
+      lastEvent,
       loading,
       error,
       refresh,
@@ -201,7 +207,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       remove,
       clearAll,
     }),
-    [items, unreadCount, loading, error, refresh, markRead, markAllRead, remove, clearAll],
+    [items, unreadCount, lastEvent, loading, error, refresh, markRead, markAllRead, remove, clearAll],
   );
 
   return (
