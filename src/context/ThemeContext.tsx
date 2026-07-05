@@ -12,13 +12,13 @@ import {
  * Theme system — the single runtime switch for the whole app.
  *
  * The app ships two themes driven entirely by CSS tokens (see
- * theme/variables.css): DARK (matte black, dark-gray components — the default)
+ * theme/variables.css): LIGHT is the default; DARK = matte black + neutral dark gray
  * and LIGHT (white background, crisp white components). Switching is a single
  * class toggle on <html>: `theme-light` present → LIGHT, absent → DARK. Every
  * `bg-*`/`text-*`/`border-*` utility resolves to a runtime var, so the entire
  * UI re-skins instantly with no per-component logic.
  *
- * Persistence: localStorage key `wa.theme` ('dark' | 'light'), default 'dark'.
+ * Persistence: localStorage key `wa.theme` ('dark' | 'light'), default 'light'.
  * main.tsx applies the persisted class to <html> BEFORE React renders to avoid
  * a flash; this provider keeps React state and the DOM class in sync after.
  */
@@ -35,14 +35,14 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-/** Read the persisted theme, defaulting to DARK. Safe to call pre-render. */
+/** Read the persisted theme, defaulting to LIGHT. Safe to call pre-render. */
 export function getStoredTheme(): Theme {
   try {
-    return localStorage.getItem(THEME_STORAGE_KEY) === "light"
-      ? "light"
-      : "dark";
+    return localStorage.getItem(THEME_STORAGE_KEY) === "dark"
+      ? "dark"
+      : "light";
   } catch {
-    return "dark";
+    return "light";
   }
 }
 

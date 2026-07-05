@@ -50,20 +50,21 @@
   --ion-color-danger-tint: #f15757;
 
   /* -------- Tailwind runtime tokens (DARK) -------- */
-  /* Surfaces / structure — matte black bg, dark-gray components */
-  --background: #0b0c0e;
-  --surface: #17191e;
-  --surface-2: #202228;
+  /* Surfaces / structure — matte black bg, dark-gray components (NEUTRAL: no
+     blue/navy tint — pure grayscale). */
+  --background: #0d0d0d;
+  --surface: #1a1a1a;
+  --surface-2: #262626;
   /* Elevated card surface (subtle top sheen over the base surface) */
-  --surface-elev: linear-gradient(180deg, #1b1d23 0%, #16181d 100%);
-  --line: #2b2e35;
-  --line-2: #383c44;
+  --surface-elev: linear-gradient(180deg, #212121 0%, #191919 100%);
+  --line: #2e2e2e;
+  --line-2: #3d3d3d;
 
   /* Text */
-  --ink: #f2f4f7;
-  --muted: #9aa1ad;
+  --ink: #f5f5f5;
+  --muted: #a3a3a3;
   /* faint: decorative + small captions. Deepened to clear WCAG AA as text. */
-  --faint: #838b97;
+  --faint: #8a8a8a;
 
   /* Accent (gold) — constant gold in both themes */
   --gold: #d4a017;
@@ -77,8 +78,8 @@
   /* Visible keyboard/switch-control focus ring color */
   --focus-ring: #d4a017;
 
-  /* Dark text shown ON gold (constant dark in both themes — old "navy") */
-  --on-accent: #0b0c0e;
+  /* Dark text shown ON gold (constant near-black in both themes) */
+  --on-accent: #0d0d0d;
 
   /* Status colors (+ soft tints) */
   --online: #22c55e;
@@ -99,33 +100,33 @@
   --shadow-card-runtime: 0 1px 0 0 rgba(255, 255, 255, 0.02) inset,
     0 10px 30px -18px rgba(0, 0, 0, 0.7);
 
-  /* -------- Ionic chrome (DARK) -------- */
-  --ion-background-color: #0b0c0e;
-  --ion-background-color-rgb: 11, 12, 14;
-  --ion-text-color: #f2f4f7;
-  --ion-text-color-rgb: 242, 244, 247;
+  /* -------- Ionic chrome (DARK) — neutral grayscale -------- */
+  --ion-background-color: #0d0d0d;
+  --ion-background-color-rgb: 13, 13, 13;
+  --ion-text-color: #f5f5f5;
+  --ion-text-color-rgb: 245, 245, 245;
 
-  --ion-toolbar-background: #121317;
-  --ion-toolbar-color: #f2f4f7;
-  --ion-tab-bar-background: #101115;
-  --ion-tab-bar-color: #9aa1ad;
+  --ion-toolbar-background: #161616;
+  --ion-toolbar-color: #f5f5f5;
+  --ion-tab-bar-background: #121212;
+  --ion-tab-bar-color: #a3a3a3;
   --ion-tab-bar-color-selected: #d4a017;
 
-  --ion-item-background: #17191e;
-  --ion-card-background: #17191e;
+  --ion-item-background: #1a1a1a;
+  --ion-card-background: #1a1a1a;
 
-  --ion-color-step-50: #16181d;
-  --ion-color-step-100: #1c1e24;
-  --ion-color-step-150: #22242b;
-  --ion-color-step-200: #282a32;
-  --ion-color-step-250: #2e3038;
-  --ion-color-step-300: #34363f;
-  --ion-color-step-400: #4a4d56;
-  --ion-color-step-500: #61646d;
-  --ion-color-step-600: #787c85;
-  --ion-color-step-700: #8f939c;
-  --ion-color-step-800: #a6aab3;
-  --ion-color-step-900: #bdc1ca;
+  --ion-color-step-50: #171717;
+  --ion-color-step-100: #1f1f1f;
+  --ion-color-step-150: #262626;
+  --ion-color-step-200: #2b2b2b;
+  --ion-color-step-250: #303030;
+  --ion-color-step-300: #363636;
+  --ion-color-step-400: #4d4d4d;
+  --ion-color-step-500: #666666;
+  --ion-color-step-600: #7d7d7d;
+  --ion-color-step-700: #949494;
+  --ion-color-step-800: #ababab;
+  --ion-color-step-900: #c2c2c2;
 
   /* Device safe-area insets (notch / home indicator) */
   --ion-safe-area-top: env(safe-area-inset-top);
@@ -174,19 +175,19 @@ html.theme-light {
   --ion-color-danger-shade: #c22020;
   --ion-color-danger-tint: #e03c3c;
 
-  /* -------- Tailwind runtime tokens (LIGHT) -------- */
-  --background: #f4f6f9;
+  /* -------- Tailwind runtime tokens (LIGHT) — NEUTRAL grayscale, no blue/navy -------- */
+  --background: #f4f4f4;
   --surface: #ffffff;
-  --surface-2: #eef1f5;
+  --surface-2: #efefef;
   /* Elevated card surface — flat clean white (depth comes from the shadow) */
   --surface-elev: #ffffff;
-  --line: #e3e7ee;
-  --line-2: #d3d9e1;
+  --line: #e5e5e5;
+  --line-2: #d6d6d6;
 
-  --ink: #0f172a;
-  --muted: #5b6573;
-  /* faint deepened to clear AA on white (#98a2b2 was 2.58:1) */
-  --faint: #6b7480;
+  --ink: #171717;
+  --muted: #5f5f5f;
+  /* faint deepened to clear AA on white */
+  --faint: #737373;
 
   /* Accent (gold) — deeper gold for contrast on white */
   --gold: #b9860c;
@@ -216,38 +217,38 @@ html.theme-light {
   --teal: #0d9488;
   --teal-soft: rgba(13, 148, 136, 0.1);
 
-  /* Elevation — soft, layered drop shadow (no inset sheen) */
-  --shadow-card-runtime: 0 1px 2px 0 rgba(15, 23, 42, 0.04),
-    0 6px 16px -8px rgba(15, 23, 42, 0.12);
+  /* Elevation — soft, layered drop shadow (neutral, no blue tint) */
+  --shadow-card-runtime: 0 1px 2px 0 rgba(0, 0, 0, 0.05),
+    0 6px 16px -8px rgba(0, 0, 0, 0.14);
 
-  /* -------- Ionic chrome (LIGHT) -------- */
-  --ion-background-color: #f4f6f9;
-  --ion-background-color-rgb: 244, 246, 249;
-  --ion-text-color: #0f172a;
-  --ion-text-color-rgb: 15, 23, 42;
+  /* -------- Ionic chrome (LIGHT) — neutral grayscale -------- */
+  --ion-background-color: #f4f4f4;
+  --ion-background-color-rgb: 244, 244, 244;
+  --ion-text-color: #171717;
+  --ion-text-color-rgb: 23, 23, 23;
 
   --ion-toolbar-background: #ffffff;
-  --ion-toolbar-color: #0f172a;
+  --ion-toolbar-color: #171717;
   --ion-tab-bar-background: #ffffff;
-  --ion-tab-bar-color: #5b6573;
+  --ion-tab-bar-color: #5f5f5f;
   --ion-tab-bar-color-selected: #b9860c;
 
   --ion-item-background: #ffffff;
   --ion-card-background: #ffffff;
 
-  /* Light theme color steps ramp from white upward toward ink */
-  --ion-color-step-50: #f7f9fb;
-  --ion-color-step-100: #eef1f5;
-  --ion-color-step-150: #e6eaf0;
-  --ion-color-step-200: #dde2ea;
-  --ion-color-step-250: #d3d9e1;
-  --ion-color-step-300: #c5ccd6;
-  --ion-color-step-400: #aab2bf;
-  --ion-color-step-500: #8a93a2;
-  --ion-color-step-600: #6b7484;
-  --ion-color-step-700: #4f5868;
-  --ion-color-step-800: #333b49;
-  --ion-color-step-900: #1a2230;
+  /* Light theme color steps ramp from white upward toward ink (neutral) */
+  --ion-color-step-50: #f7f7f7;
+  --ion-color-step-100: #efefef;
+  --ion-color-step-150: #e8e8e8;
+  --ion-color-step-200: #e0e0e0;
+  --ion-color-step-250: #d6d6d6;
+  --ion-color-step-300: #c9c9c9;
+  --ion-color-step-400: #adadad;
+  --ion-color-step-500: #8f8f8f;
+  --ion-color-step-600: #707070;
+  --ion-color-step-700: #545454;
+  --ion-color-step-800: #383838;
+  --ion-color-step-900: #1f1f1f;
 }
 
 /* Ion content background must follow the theme too */
