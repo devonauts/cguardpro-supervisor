@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useHistory } from "react-router-dom";
 import { useIonViewWillEnter, useIonViewWillLeave, useIonToast } from "@ionic/react";
 import {
-  MessageSquare, SignalHigh, Building2, ShieldCheck, Users, Plus,
+  Building2, ShieldCheck, Users, Plus,
   Mic, Volume2, AudioLines, Settings, Play, PhoneOff, UserCircle2, Radio as RadioIcon,
 } from "lucide-react";
 import { Screen } from "@/components/Screen";
+import { NavActions } from "@/components/shared/NavActions";
 import { useRadio } from "@/context/RadioContext";
 import { supervisorRoute } from "@/lib/supervisorRoute";
 import { useAsync } from "@/lib/useAsync";
@@ -31,7 +31,6 @@ function fmtTime(ms: number): string {
 
 export default function SupervisorRadio() {
   const { t } = useTranslation();
-  const history = useHistory();
   const [present] = useIonToast();
   const { state, roster, speaker, talking, hint, myId, someoneElseTalking, onDuty, setScreenActive, resume, pressTalk, releaseTalk } = useRadio();
 
@@ -85,15 +84,8 @@ export default function SupervisorRadio() {
     releaseTalk();
   };
 
-  const right = (
-    <div className="flex items-center gap-1.5">
-      <button type="button" onClick={() => { fb.tap(); history.push("/supervisor/notifications"); }} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><MessageSquare size={20} /></button>
-      <SignalHigh size={20} className={state === "connected" ? "text-online" : "text-muted"} />
-    </div>
-  );
-
   return (
-    <Screen largeTitle={t("nav.radio", "Radio")} right={right} back flush onPointerDown={resume}>
+    <Screen largeTitle={t("nav.radio", "Radio")} right={<NavActions />} back flush onPointerDown={resume}>
         {/* Tabs */}
         <div className={`${styles.tabs} mt-3`}>
           {([["channels", t("radio.tabChannels", "Canales")], ["recent", t("radio.tabRecent", "Recientes")], ["contacts", t("radio.tabContacts", "Contactos")], ["scan", t("radio.tabScan", "Escanear")]] as [Tab, string][]).map(([k, l]) => (
