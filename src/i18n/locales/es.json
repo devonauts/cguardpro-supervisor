@@ -1128,7 +1128,14 @@
       "onDutyStations": "En servicio",
       "late": "Retrasadas",
       "offline": "Sin conexión"
-    }
+    },
+    "offDuty": "Fuera de turno",
+    "onBreak": "En descanso",
+    "breaks": "Descansos",
+    "breakNone": "Sin descansos aún",
+    "breakStart": "Iniciar descanso",
+    "breakEnd": "Terminar descanso",
+    "breakSummary": "{{count}} descanso(s) · {{min}} min en total"
   },
   "notif": {
     "title": "Notificaciones",

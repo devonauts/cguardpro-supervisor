@@ -1,13 +1,15 @@
+import { useEffect, useState } from "react";
 import { IonMenu, IonContent } from "@ionic/react";
 import { menuController } from "@ionic/core/components";
 import { useHistory, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
   ShieldAlert, Users2, Route as RouteIcon,
-  CalendarDays, Shirt, LifeBuoy, LogOut,
+  CalendarDays, Shirt, LifeBuoy, LogOut, Clock, ChevronRight,
 } from "lucide-react";
 import brandLogo from "@/assets/brand-logo.png";
 import { useAuth } from "@/context/AuthContext";
+import { getDuty, subscribeDuty } from "@/lib/dutyState";
 import fb from "@/lib/feedback";
 
 /** Menu id — used by the hamburger to open the drawer from anywhere. */
@@ -27,6 +29,10 @@ export function SideMenu() {
   const { user, signOut } = useAuth();
 
   const name = user?.fullName || user?.name || user?.email || "—";
+
+  // Live on/off-duty state for the clock control (kept in sync by SupervisorClockIn).
+  const [onDuty, setOnDuty] = useState<boolean>(getDuty());
+  useEffect(() => subscribeDuty(setOnDuty), []);
 
   // Only destinations NOT already in the bottom tab bar (Dashboard / Stations /
   // Guards / Messages / Reports live there) — the menu never duplicates the tabs.
@@ -57,6 +63,33 @@ export function SideMenu() {
             <p className="truncate text-[16px] font-extrabold text-ink">C-GuardPro</p>
             <p className="truncate text-[12.5px] text-muted">{name}</p>
           </div>
+        </div>
+
+        {/* Clock in / out — the supervisor's own shift. Live duty status. */}
+        <div className="px-3 pt-4">
+          <button
+            type="button"
+            onClick={() => go("/supervisor/clock-in")}
+            className={`pressable flex w-full items-center gap-3 rounded-2xl border p-3.5 text-left ${
+              onDuty ? "border-online/40 bg-online/10" : "border-gold/40 bg-gold/10"
+            }`}
+          >
+            <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${onDuty ? "bg-online/20 text-online" : "bg-gold/20 text-gold"}`}>
+              <Clock size={22} />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="flex items-center gap-1.5">
+                <span className={`h-2 w-2 rounded-full ${onDuty ? "bg-online" : "bg-faint"}`} />
+                <span className="text-[13px] font-bold uppercase tracking-wide" style={{ color: onDuty ? "var(--online)" : "var(--gold)" }}>
+                  {onDuty ? t("supervisor.onDuty", "En turno") : t("supervisor.offDuty", "Fuera de turno")}
+                </span>
+              </span>
+              <span className="mt-0.5 block text-[15px] font-semibold text-ink">
+                {onDuty ? t("supervisor.clockOut", "Marcar salida") : t("supervisor.clockIn", "Marcar entrada")}
+              </span>
+            </span>
+            <ChevronRight size={18} className="shrink-0 text-faint" />
+          </button>
         </div>
 
         {/* Destinations */}

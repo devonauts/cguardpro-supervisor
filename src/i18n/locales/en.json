@@ -1128,7 +1128,14 @@
       "onDutyStations": "On Duty",
       "late": "Late",
       "offline": "Offline"
-    }
+    },
+    "offDuty": "Off duty",
+    "onBreak": "On break",
+    "breaks": "Breaks",
+    "breakNone": "No breaks yet",
+    "breakStart": "Start break",
+    "breakEnd": "End break",
+    "breakSummary": "{{count}} break(s) · {{min}} min total"
   },
   "notif": {
     "title": "Notifications",

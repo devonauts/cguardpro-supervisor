@@ -10,6 +10,8 @@ import {
   LogIn,
   LogOut,
   Loader2,
+  Coffee,
+  Play,
 } from "lucide-react";
 import { Screen } from "@/components/Screen";
 import {
@@ -89,6 +91,28 @@ export default function SupervisorClockIn() {
   const [busy, setBusy] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [result, setResult] = useState<"in" | "out" | null>(null);
+
+  // ── Break state (only while on duty) ────────────────────────────────────
+  const shift: any = (data && (data.shift || data)) || null;
+  const onBreak = Boolean(shift?.onBreak);
+  const breakMinutes = Number(shift?.breakMinutes) || 0;
+  const breakCount = Array.isArray(shift?.breaks) ? shift.breaks.length : 0;
+  const [breakBusy, setBreakBusy] = useState(false);
+  const toggleBreak = async () => {
+    if (breakBusy) return;
+    setBreakBusy(true);
+    fb.press();
+    try {
+      if (onBreak) await supervisorRoute.breakEnd();
+      else await supervisorRoute.breakStart();
+      fb.success();
+      await reload();
+    } catch {
+      fb.error();
+    } finally {
+      setBreakBusy(false);
+    }
+  };
 
   // ── Selfie picker (clock-in) ────────────────────────────────────────────
   const [selfie, setSelfie] = useState<CapturedImage | null>(null);
@@ -243,6 +267,38 @@ export default function SupervisorClockIn() {
             {since && (
               <p className="mt-0.5 text-xs text-faint">{relativeTime(since)}</p>
             )}
+          </Card>
+
+          {/* Breaks */}
+          <Card className={`p-4 ${onBreak ? "border-gold/40 bg-gold/5" : ""}`}>
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-xl ${onBreak ? "bg-gold/15 text-gold" : "bg-surface-2 text-muted"}`}>
+                  <Coffee size={20} />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-[15px] font-semibold text-ink">
+                    {onBreak ? t("supervisor.onBreak", "En descanso") : t("supervisor.breaks", "Descansos")}
+                  </p>
+                  <p className="text-xs text-muted">
+                    {breakCount > 0
+                      ? t("supervisor.breakSummary", "{{count}} descanso(s) · {{min}} min en total", { count: breakCount, min: breakMinutes })
+                      : t("supervisor.breakNone", "Sin descansos aún")}
+                  </p>
+                </div>
+              </div>
+            </div>
+            <Button
+              variant={onBreak ? "primary" : "outline"}
+              full
+              disabled={breakBusy}
+              onClick={toggleBreak}
+              className="mt-3 justify-center gap-2"
+            >
+              {breakBusy ? <Loader2 size={18} className="animate-spin" />
+                : onBreak ? <Play size={18} /> : <Coffee size={18} />}
+              {onBreak ? t("supervisor.breakEnd", "Terminar descanso") : t("supervisor.breakStart", "Iniciar descanso")}
+            </Button>
           </Card>
 
           <Card className="p-4">

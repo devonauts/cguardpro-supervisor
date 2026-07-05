@@ -149,6 +149,14 @@ export const supervisorRoute = {
   /** Clock out (report/geo in body). */
   clockOut: (body?: unknown) =>
     api.post(tenantPath("/supervisor/me/clock-out"), body).then(unwrap),
+
+  /** Start a break on the open shift. */
+  breakStart: () =>
+    api.post(tenantPath("/supervisor/me/break/start"), {}).then(unwrap),
+
+  /** End the current break. */
+  breakEnd: () =>
+    api.post(tenantPath("/supervisor/me/break/end"), {}).then(unwrap),
 };
 
 /**
