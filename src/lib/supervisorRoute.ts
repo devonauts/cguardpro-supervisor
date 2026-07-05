@@ -108,6 +108,10 @@ export const supervisorRoute = {
   clockStatus: () =>
     api.get(tenantPath("/supervisor/me/clock")).then(unwrap),
 
+  /** The supervisor's OWN upcoming turno windows (their shift, not guards'). */
+  schedule: () =>
+    api.get(tenantPath("/supervisor/me/schedule")).then(unwrap),
+
   /** Clock in (selfie/vehicle/geo in body). */
   clockIn: (body?: unknown) =>
     api.post(tenantPath("/supervisor/me/clock-in"), body).then(unwrap),
