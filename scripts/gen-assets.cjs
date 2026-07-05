@@ -73,6 +73,17 @@ async function compose(size, logoFrac, bg) {
     .png()
     .toFile(path.join(WEB, "brand-logo.png"));
 
+  // PWA / web icons referenced by src/manifest.webmanifest — the logo on navy,
+  // sliced from the same 1024 app icon so they always track the current logo.
+  const WEB_ICONS = path.join(WEB, "icons");
+  fs.mkdirSync(WEB_ICONS, { recursive: true });
+  for (const size of [48, 72, 96, 128, 192, 256, 512]) {
+    await sharp(icon)
+      .resize(size, size)
+      .webp({ quality: 90 })
+      .toFile(path.join(WEB_ICONS, `icon-${size}.webp`));
+  }
+
   console.log("✔ assets generated from", path.basename(SRC));
 })().catch((e) => {
   console.error(e);
