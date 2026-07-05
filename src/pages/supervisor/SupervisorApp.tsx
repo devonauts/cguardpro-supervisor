@@ -27,6 +27,7 @@ import Emergency from "./Emergency";
 import SupervisorMessages from "./SupervisorMessages";
 import SupervisorThread from "./SupervisorThread";
 import Profile from "../shared/Profile";
+import GuardPermissions from "../guard/GuardPermissions";
 
 // Route / patrullaje flow (still reachable via deep links + Más, not tabbed)
 import RouteToday from "./RouteToday";
@@ -86,6 +87,7 @@ export default function SupervisorApp() {
         <Route exact path="/supervisor/incidents" component={SupervisorIncidents} />
         <Route exact path="/supervisor/incidents/:incidentId" component={IncidentDetail} />
         <Route exact path="/supervisor/profile" component={Profile} />
+        <Route exact path="/supervisor/permissions" component={GuardPermissions} />
 
         {/* Vehicle-patrol route flow (not tabbed) */}
         <Route exact path="/supervisor/route" component={RouteToday} />

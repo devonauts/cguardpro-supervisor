@@ -418,15 +418,13 @@ export default function Profile() {
         <div>
           <SectionHeader title={t("profile.groupDevice", "Dispositivo y app")} />
           <MenuList>
-            {!isSupervisor && (
-              <MenuRow
-                tone="green"
-                icon={<ShieldCheck size={18} />}
-                title={t("profile.permissions", "Permisos del dispositivo")}
-                subtitle={t("profile.permissionsSub", "Ubicación, cámara y notificaciones")}
-                onClick={() => history.push("/guard/permissions")}
-              />
-            )}
+            <MenuRow
+              tone="green"
+              icon={<ShieldCheck size={18} />}
+              title={t("profile.permissions", "Permisos del dispositivo")}
+              subtitle={t("profile.permissionsSub", "Ubicación, cámara, micrófono y notificaciones")}
+              onClick={() => history.push(isSupervisor ? "/supervisor/permissions" : "/guard/permissions")}
+            />
             <MenuRow
               tone="blue"
               icon={<Globe size={18} />}
