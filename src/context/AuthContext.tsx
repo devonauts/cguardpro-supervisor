@@ -93,10 +93,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const incomplete =
         !u || (!Array.isArray(u.tenants) && !u.roles && !u.role);
       if (incomplete) {
-        try {
-          u = await AuthService.getProfile();
-        } catch {
-          /* fall back to whatever sign-in returned */
+        // The role gate NEEDS the profile. If /auth/me can't be reached (a slow
+        // or flaky link — e.g. on an iPad), we must NOT fall through to the gate
+        // with an incomplete user, or a valid supervisor gets wrongly told "no
+        // autorizado". Retry once, then treat a failure as a NETWORK error.
+        let fetched: any = null;
+        for (let attempt = 0; attempt < 2 && !fetched; attempt++) {
+          try {
+            fetched = await AuthService.getProfile();
+          } catch (e) {
+            console.warn(`[auth] getProfile failed (attempt ${attempt + 1}):`, e);
+          }
+        }
+        if (fetched) {
+          u = fetched;
+        } else {
+          setToken(null);
+          setTenantId(null);
+          return { success: false, error: t("auth.errorGeneric") };
         }
       }
 
@@ -112,6 +126,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setRole(resolveWorkerRole(u));
       return { success: true };
     } catch (err: any) {
+      // Surface the real reason in Safari Web Inspector (iPad/iPhone on-device).
+      console.warn("[auth] signIn failed:", err?.status, err?.message || err);
       if (err instanceof ApiError) {
         if (err.status === 429) return { success: false, error: t("auth.rateLimited") };
         if (err.status === 401 || err.status === 403)
