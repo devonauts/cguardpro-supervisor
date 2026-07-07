@@ -70,9 +70,17 @@ export default function RouteArrival() {
   const finish = async () => {
     if (finishing) return;
     setFinishing(true);
-    try { await supervisorRoute.finish(routeId, {}); } catch { /* best-effort */ }
-    fb.success();
-    history.replace(`/supervisor/route/${routeId}/summary`);
+    try {
+      await supervisorRoute.finish(routeId, {});
+      // Only confirm + navigate once the backend actually recorded the finish.
+      fb.success();
+      history.replace(`/supervisor/route/${routeId}/summary`);
+    } catch {
+      fb.error();
+      setSubmitError(true);
+    } finally {
+      setFinishing(false);
+    }
   };
 
   if (loading && !data) {

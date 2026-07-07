@@ -65,6 +65,21 @@ export default function App() {
   // app unmount (StrictMode-safe — start/stop are idempotent).
   useEffect(() => { startDeviceStatus(); return () => stopDeviceStatus(); }, []);
 
+  // Android hardware back button: navigate back through the router history when a
+  // stack exists, otherwise minimize instead of dumping the user out of the app.
+  useEffect(() => {
+    let sub: { remove: () => void } | undefined;
+    (async () => {
+      try {
+        sub = await CapApp.addListener("backButton", ({ canGoBack }: { canGoBack: boolean }) => {
+          if (canGoBack) window.history.back();
+          else CapApp.minimizeApp?.();
+        });
+      } catch { /* not native */ }
+    })();
+    return () => { try { sub?.remove(); } catch { /* ignore */ } };
+  }, []);
+
   // Listen for reset deep links (cold start + while running) and the web URL.
   useEffect(() => {
     let sub: { remove: () => void } | undefined;

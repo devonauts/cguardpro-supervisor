@@ -35,9 +35,17 @@ export default function RouteTimeline() {
   const start = async () => {
     if (starting) return;
     setStarting(true);
-    try { await supervisorRoute.start(routeId); } catch { /* start best-effort; continue into the mission */ }
-    fb.success();
-    history.push(`/supervisor/route/${routeId}/mission/0`);
+    try {
+      await supervisorRoute.start(routeId);
+      // Only confirm + enter the mission once the backend recorded the start —
+      // otherwise the route session is broken (finish/summary would have no start).
+      fb.success();
+      history.push(`/supervisor/route/${routeId}/mission/0`);
+    } catch {
+      fb.error(); // stay so the supervisor can retry
+    } finally {
+      setStarting(false);
+    }
   };
 
   return (

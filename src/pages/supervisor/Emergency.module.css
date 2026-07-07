@@ -14,7 +14,7 @@
 .sosRing { position: absolute; border-radius: 9999px; border: 1px solid rgba(239, 68, 68, 0.35); animation: sospulse 2.6s ease-out infinite; }
 @keyframes sospulse { 0% { transform: scale(0.6); opacity: 0.7; } 100% { transform: scale(1.35); opacity: 0; } }
 .sosBtn {
-  position: relative; width: 210px; height: 210px; aspect-ratio: 1 / 1; border-radius: 50%;
+  position: relative; width: min(210px, 72vw); height: min(210px, 72vw); aspect-ratio: 1 / 1; border-radius: 50%;
   display: grid; place-items: center; text-align: center;
   background: radial-gradient(circle at 50% 40%, #ff4d4d, #c81e1e 62%, #7f1010);
   box-shadow: 0 0 0 10px rgba(239, 68, 68, 0.12), 0 0 90px 6px rgba(239, 68, 68, 0.55);

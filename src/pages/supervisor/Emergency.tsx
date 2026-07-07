@@ -118,9 +118,9 @@ export default function Emergency({ onClose }: { onClose?: () => void } = {}) {
           {/* SOS */}
           <div className={styles.sosWrap}>
             <div className={styles.sosRings}>
-              <span className={styles.sosRing} style={{ width: 240, height: 240 }} />
-              <span className={styles.sosRing} style={{ width: 320, height: 320, animationDelay: "0.8s" }} />
-              <span className={styles.sosRing} style={{ width: 400, height: 400, animationDelay: "1.6s" }} />
+              <span className={styles.sosRing} style={{ width: "min(240px, 56vw)", height: "min(240px, 56vw)" }} />
+              <span className={styles.sosRing} style={{ width: "min(320px, 76vw)", height: "min(320px, 76vw)", animationDelay: "0.8s" }} />
+              <span className={styles.sosRing} style={{ width: "min(400px, 92vw)", height: "min(400px, 92vw)", animationDelay: "1.6s" }} />
             </div>
             <button type="button" disabled={busy} className={styles.sosBtn} onClick={() => { fb.tap(); askFire(t("sos.sosSubject", "🆘 SOS — Emergencia"), t("sos.sosBody", "Alerta SOS activada. Ubicación y cámaras compartidas automáticamente."), true); }}>
               <div>

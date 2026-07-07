@@ -55,9 +55,16 @@ export default function RouteMissionStop() {
   const finish = async () => {
     if (finishing) return;
     setFinishing(true);
-    try { await supervisorRoute.finish(routeId, {}); } catch { /* best-effort */ }
-    fb.success();
-    history.replace(`/supervisor/route/${routeId}/summary`);
+    try {
+      await supervisorRoute.finish(routeId, {});
+      // Only confirm + navigate once the backend recorded the finish.
+      fb.success();
+      history.replace(`/supervisor/route/${routeId}/summary`);
+    } catch {
+      fb.error(); // stay on the page so the supervisor can retry
+    } finally {
+      setFinishing(false);
+    }
   };
 
   const notify = async () => {
