@@ -5,6 +5,7 @@ import { App as CapApp } from "@capacitor/app";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { NotificationProvider } from "./context/NotificationContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
 import { registerPush } from "./lib/push";
 import AnimatedSplash from "./components/AnimatedSplash";
 import { StatusBanner } from "./components/StatusBanner";
@@ -121,17 +122,19 @@ export default function App() {
       <IonApp>
         <AnimatedSplash />
         <StatusBanner />
-        <AuthProvider>
-          <NotificationProvider>
-            <IonReactRouter>
-              {resetToken ? (
-                <ResetPassword token={resetToken} onDone={() => setResetToken(null)} />
-              ) : (
-                <Gate />
-              )}
-            </IonReactRouter>
-          </NotificationProvider>
-        </AuthProvider>
+        <ErrorBoundary>
+          <AuthProvider>
+            <NotificationProvider>
+              <IonReactRouter>
+                {resetToken ? (
+                  <ResetPassword token={resetToken} onDone={() => setResetToken(null)} />
+                ) : (
+                  <Gate />
+                )}
+              </IonReactRouter>
+            </NotificationProvider>
+          </AuthProvider>
+        </ErrorBoundary>
       </IonApp>
     </ThemeProvider>
   );

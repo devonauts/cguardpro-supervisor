@@ -248,7 +248,7 @@ export function StationsMap({ stations, filter = null, onSelect, onOpenDetail, o
       <div ref={elRef} className="h-full w-full" />
 
       {/* floating controls, bottom-right (cleared above the tab bar by the page) */}
-      <div className="absolute bottom-4 right-4 z-[500] flex flex-col gap-3">
+      <div className="absolute right-4 z-[500] flex flex-col gap-3" style={{ bottom: "calc(env(safe-area-inset-bottom) + 1rem)" }}>
         <button type="button" aria-label="Centrar en mi ubicación" className="stnmap-ctrl" onClick={recenterMe}>
           <Crosshair size={20} />
         </button>

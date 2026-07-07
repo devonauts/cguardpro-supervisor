@@ -24,7 +24,7 @@ export function StatusBanner() {
       {!online && (
         <div className="flex items-center justify-center gap-2 bg-critical px-3 py-1.5 text-[11px] font-bold text-white">
           <WifiOff size={13} />
-          {t("net.offline", "Sin conexión — los cambios se guardarán y se enviarán al reconectar.")}
+          {t("net.offline", "Sin conexión — algunas acciones no estarán disponibles hasta que se restablezca.")}
         </div>
       )}
       {online && lowBattery && (

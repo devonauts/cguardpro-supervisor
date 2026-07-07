@@ -181,7 +181,7 @@ export function PatrolMap({ checkpoints, guard = null, height = 220, className =
   return (
     <div className={`patmap-wrap ${dark ? "" : "is-light"} ${className}`} style={{ height }}>
       <div ref={elRef} className="h-full w-full" />
-      <div className="absolute bottom-3 right-3 z-[500] flex flex-col gap-2.5">
+      <div className="absolute right-3 z-[500] flex flex-col gap-2.5" style={{ bottom: "calc(env(safe-area-inset-bottom) + 0.75rem)" }}>
         <button type="button" aria-label="Centrar" className="stnmap-ctrl" onClick={fitAll}>
           <Crosshair size={19} />
         </button>

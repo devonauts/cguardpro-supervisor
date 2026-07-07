@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
   type ReactNode,
@@ -187,10 +188,15 @@ export function RadioProvider({ children }: { children: ReactNode }) {
 
   const someoneElseTalking = !!speaker && speaker.userId !== myId;
 
+  // Memoize so a roster/speaker/talking tick doesn't re-render every useRadio()
+  // consumer (FloatingRadioButton reads 12 props off this).
+  const value = useMemo(
+    () => ({ onDuty, state, roster, speaker, talking, hint, myId, someoneElseTalking, screenActive, setScreenActive, resume, pressTalk, releaseTalk }),
+    [onDuty, state, roster, speaker, talking, hint, myId, someoneElseTalking, screenActive, setScreenActive, resume, pressTalk, releaseTalk],
+  );
+
   return (
-    <RadioContext.Provider
-      value={{ onDuty, state, roster, speaker, talking, hint, myId, someoneElseTalking, screenActive, setScreenActive, resume, pressTalk, releaseTalk }}
-    >
+    <RadioContext.Provider value={value}>
       {children}
     </RadioContext.Provider>
   );

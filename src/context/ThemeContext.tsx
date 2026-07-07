@@ -53,13 +53,31 @@ export function applyThemeClass(theme: Theme): void {
   el.classList.toggle("theme-light", theme === "light");
 }
 
+/**
+ * Sync the NATIVE status bar to the theme so it's readable in both modes.
+ * Style.Dark = dark text (for a light background); Style.Light = light text (for
+ * a dark background). Android also gets a matching background color. No-op on web.
+ */
+export function syncNativeStatusBar(theme: Theme): void {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    const { Capacitor } = require("@capacitor/core");
+    if (!Capacitor.isNativePlatform()) return;
+    import("@capacitor/status-bar").then(({ StatusBar, Style }) => {
+      StatusBar.setStyle({ style: theme === "light" ? Style.Dark : Style.Light }).catch(() => {});
+      StatusBar.setBackgroundColor?.({ color: theme === "light" ? "#ffffff" : "#0d0d0d" }).catch(() => {});
+    }).catch(() => {});
+  } catch { /* plugin unavailable */ }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(() => getStoredTheme());
 
   const firstRun = useRef(true);
-  // Keep the DOM class + storage in sync whenever the theme changes.
+  // Keep the DOM class + storage + native status bar in sync with the theme.
   useEffect(() => {
     applyThemeClass(theme);
+    syncNativeStatusBar(theme);
     try {
       localStorage.setItem(THEME_STORAGE_KEY, theme);
     } catch {

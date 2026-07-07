@@ -291,6 +291,13 @@ button:not(:disabled):not(.no-press):not([class*="ion-"]):active,
 }
 
 /* Hide scrollbars on horizontal scrollers but keep scrolling */
+/* Native iOS momentum/inertial scrolling for custom scroll containers (modal
+   bodies, sheets, lists that aren't IonContent). Without this, overflow scrolling
+   feels dead on iOS instead of the native rubber-band flick. */
+.overflow-y-auto, .overflow-auto, .overflow-y-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
