@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { IonModal } from "@ionic/react";
+import { IonModal, useIonToast } from "@ionic/react";
 import { modalEnterAnimation, modalLeaveAnimation } from "@/lib/modalAnimation";
 import { useTranslation } from "react-i18next";
 import { X, Loader2, Check, AlertTriangle, MapPin, Zap } from "lucide-react";
@@ -10,6 +10,8 @@ import { getCurrentPosition, Coords } from "@/lib/geo";
 import { usePhotoCapture, PhotoStrip } from "./photoCapture";
 import { CustomSelect } from "./Select";
 import fb from "@/lib/feedback";
+import { enqueue, fileToDataUrl } from "@/lib/offlineQueue";
+import { isNetworkError } from "@/lib/api";
 
 const SEVERITIES: Severity[] = ["critical", "high", "medium", "low"];
 // Standard security-company incident taxonomy (merged with tenant-configured types).
@@ -122,6 +124,7 @@ function IncidentBody({
   const [peopleInvolved, setPeopleInvolved] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [present] = useIonToast();
 
   // "Reporte rápido": type + photo + auto-GPS is enough to file — everything
   // else (description, people, actions, occurred-at) becomes optional.
@@ -158,13 +161,56 @@ function IncidentBody({
       .catch(() => setGeoState("failed"));
   };
 
+  // The report body, minus the photo field (attached at send time). Guard endpoint
+  // links `idPhoto`→imageUrl; admin create links `imageUrl`.
+  const buildData = (photoField?: any): Record<string, any> => ({
+    subject: subject.trim(),
+    title: subject.trim(),
+    content: description.trim() || undefined,
+    description: description.trim() || undefined,
+    priority: severity,
+    status: "abierto",
+    location: location.trim() || undefined,
+    // Geo-tag the report when a fix was captured.
+    latitude: coords?.latitude,
+    longitude: coords?.longitude,
+    incidentAt: occurredAt ? new Date(occurredAt).toISOString() : new Date().toISOString(),
+    incidentTypeId: resolveTypeId(),
+    actionsTaken: actionsTaken.trim() || undefined,
+    action: actionsTaken.trim() || undefined,
+    internalNotes: peopleInvolved.trim() || undefined,
+    stationId: station?.id,
+    postSiteId: station?.postSiteId,
+    idPhoto: photoField,
+    imageUrl: photoField,
+  });
+
+  // Persist the report to the offline queue (deferring photos as data URLs) so it
+  // sends automatically on reconnect. Closes the form as a success.
+  const queueOffline = async () => {
+    const photoDataUrls: string[] = [];
+    for (const p of photos) {
+      try { photoDataUrls.push(await fileToDataUrl(p.file)); } catch { /* skip a photo we can't read */ }
+    }
+    enqueue("incident.create", { data: buildData(), photoDataUrls, asGuard }, t("incidents.newTitle", "Reporte de incidente"));
+    fb.success();
+    present({ message: t("net.queuedReport", "Sin conexión — el reporte se enviará al reconectar."), duration: 2600, color: "medium", position: "top" });
+    onCreated();
+    onClose();
+  };
+
   const submit = async () => {
     if (!subject.trim() || submitting) return;
     fb.press(); // medium haptic for a primary action (suppresses the global light tap)
     setSubmitting(true);
     setError(null);
     try {
-      // Upload evidence photos → descriptors.
+      // No connection at all → queue immediately (the server never sees it).
+      if (typeof navigator !== "undefined" && navigator.onLine === false) {
+        await queueOffline();
+        return;
+      }
+      // Online: upload evidence photos → create.
       const descriptors: any[] = [];
       for (const p of photos) {
         try {
@@ -175,35 +221,15 @@ function IncidentBody({
         }
       }
       const photoField = descriptors.length ? descriptors : undefined;
-
-      const data: Record<string, any> = {
-        subject: subject.trim(),
-        title: subject.trim(),
-        content: description.trim() || undefined,
-        description: description.trim() || undefined,
-        priority: severity,
-        status: "abierto",
-        location: location.trim() || undefined,
-        // Geo-tag the report when a fix was captured.
-        latitude: coords?.latitude,
-        longitude: coords?.longitude,
-        incidentAt: occurredAt ? new Date(occurredAt).toISOString() : new Date().toISOString(),
-        incidentTypeId: resolveTypeId(),
-        actionsTaken: actionsTaken.trim() || undefined,
-        action: actionsTaken.trim() || undefined,
-        internalNotes: peopleInvolved.trim() || undefined,
-        stationId: station?.id,
-        postSiteId: station?.postSiteId,
-        // Guard endpoint links `idPhoto`→imageUrl; admin create links `imageUrl`.
-        idPhoto: photoField,
-        imageUrl: photoField,
-      };
-
       const createFn = asGuard ? incidentService.createAsGuard : incidentService.create;
-      await createFn(data);
+      await createFn(buildData(photoField));
       onCreated();
       onClose();
     } catch (e: any) {
+      // The request never reached the server → queue it instead of failing.
+      if (isNetworkError(e)) {
+        try { await queueOffline(); return; } catch { /* fall through to error */ }
+      }
       setError(e?.message || "error");
     } finally {
       setSubmitting(false);

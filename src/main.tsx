@@ -20,6 +20,8 @@ import App from "./App";
 import { Capacitor } from "@capacitor/core";
 import { installGlobalErrorLogging, logInfo } from "./lib/errorLog";
 import { initTapFeedback } from "./lib/feedback";
+import { initOfflineQueue } from "./lib/offlineQueue";
+import "./lib/offlineReplayers";
 import { applyThemeClass, getStoredTheme } from "./context/ThemeContext";
 
 // Apply the persisted theme class to <html> BEFORE React renders so there is no
@@ -34,6 +36,9 @@ installGlobalErrorLogging();
 // (respecting the Profile "Sonidos y vibración" toggle), de-duped against
 // components that already emit their own richer feedback.
 initTapFeedback();
+
+// Replay any mutations queued while offline, and flush on every reconnect.
+initOfflineQueue();
 
 // One-time environment snapshot — camera (getUserMedia) and geolocation BOTH
 // require a secure context (HTTPS or localhost). If `secureContext` is false
