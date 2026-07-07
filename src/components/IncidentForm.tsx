@@ -9,6 +9,7 @@ import { Severity } from "@/lib/normalize";
 import { getCurrentPosition, Coords } from "@/lib/geo";
 import { usePhotoCapture, PhotoStrip } from "./photoCapture";
 import { CustomSelect } from "./Select";
+import fb from "@/lib/feedback";
 
 const SEVERITIES: Severity[] = ["critical", "high", "medium", "low"];
 // Standard security-company incident taxonomy (merged with tenant-configured types).
@@ -159,6 +160,7 @@ function IncidentBody({
 
   const submit = async () => {
     if (!subject.trim() || submitting) return;
+    fb.press(); // medium haptic for a primary action (suppresses the global light tap)
     setSubmitting(true);
     setError(null);
     try {

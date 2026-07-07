@@ -64,7 +64,8 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  width: 140px;
+  /* Scale down on narrow phones so 4 cards don't overflow a 320px viewport. */
+  width: clamp(112px, 40vw, 140px);
   flex-shrink: 0;
   padding: 1rem 1.125rem;
   border-radius: 1rem;

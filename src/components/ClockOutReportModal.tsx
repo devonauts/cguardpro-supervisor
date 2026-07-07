@@ -5,6 +5,7 @@ import { modalEnterAnimation, modalLeaveAnimation } from "@/lib/modalAnimation";
 import { X, FileText, Send, Loader2, Mic, Square, Plus, Trash2, ClipboardList, CheckCircle2 } from "lucide-react";
 import { useSpeechToText } from "@/lib/useSpeechToText";
 import { ErrorState } from "@/components/ui";
+import fb from "@/lib/feedback";
 
 const footerStyle = { paddingBottom: "calc(env(safe-area-inset-bottom) + 16px)" };
 
@@ -73,12 +74,14 @@ function ReportBody({
       setTouched(true);
       return;
     }
+    fb.press(); // medium haptic for a primary action
     if (listening) stop();
     onSubmit({ summary: s, instructions: cleanInstructions() });
   };
 
   // One-tap: nothing to hand over.
   const submitSinNovedad = () => {
+    fb.press();
     if (listening) stop();
     onSubmit({ summary: t("passdown.noNews", "Sin novedad"), instructions: [] });
   };
