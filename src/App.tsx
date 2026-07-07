@@ -8,7 +8,7 @@ import { ThemeProvider } from "./context/ThemeContext";
 import { registerPush } from "./lib/push";
 import AnimatedSplash from "./components/AnimatedSplash";
 import { StatusBanner } from "./components/StatusBanner";
-import { startDeviceStatus } from "./lib/deviceStatus";
+import { startDeviceStatus, stopDeviceStatus } from "./lib/deviceStatus";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import SupervisorApp from "./pages/supervisor/SupervisorApp";
@@ -61,8 +61,9 @@ function Gate() {
 export default function App() {
   const [resetToken, setResetToken] = useState<string | null>(null);
 
-  // Start network + battery monitoring once for the whole app.
-  useEffect(() => { startDeviceStatus(); }, []);
+  // Start network + battery monitoring once for the whole app; tear it down on
+  // app unmount (StrictMode-safe — start/stop are idempotent).
+  useEffect(() => { startDeviceStatus(); return () => stopDeviceStatus(); }, []);
 
   // Listen for reset deep links (cold start + while running) and the web URL.
   useEffect(() => {

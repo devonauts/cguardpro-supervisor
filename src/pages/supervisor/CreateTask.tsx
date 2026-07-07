@@ -66,6 +66,10 @@ export default function CreateTask() {
   const [due, setDue] = useState("");
   const [repeat, setRepeat] = useState("none");
   const [attachments, setAttachments] = useState<Attachment[]>([]);
+  // Revoke any remaining preview object URLs on unmount (avoid blob leaks).
+  const attachmentsRef = useRef(attachments);
+  attachmentsRef.current = attachments;
+  useEffect(() => () => { attachmentsRef.current.forEach((a) => a.previewUrl && URL.revokeObjectURL(a.previewUrl)); }, []);
   const [guardPickerOpen, setGuardPickerOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -255,7 +259,7 @@ export default function CreateTask() {
         {attachments.map((a, i) => (
           <div key={i} className={styles.thumb}>
             {a.isVideo ? <video src={a.previewUrl} muted /> : <img src={a.previewUrl} alt="" />}
-            <button type="button" className={styles.thumbDel} onClick={() => setAttachments((arr) => arr.filter((_, j) => j !== i))}><X size={12} /></button>
+            <button type="button" className={styles.thumbDel} onClick={() => setAttachments((arr) => { const rm = arr[i]; if (rm?.previewUrl) URL.revokeObjectURL(rm.previewUrl); return arr.filter((_, j) => j !== i); })}><X size={12} /></button>
             {a.isVideo && <span className={styles.thumbDel} style={{ top: "auto", bottom: 3, right: "auto", left: 3, background: "rgba(0,0,0,.55)" }}><Play size={11} /></span>}
           </div>
         ))}

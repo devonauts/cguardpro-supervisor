@@ -47,7 +47,9 @@ function reconcileFromStorage(): void {
 // Keep multiple webviews/tabs (web/PWA) in sync. The 'storage' event fires in
 // OTHER documents when this KEY changes; visibilitychange catches the case where
 // the value changed while this document was backgrounded.
-if (typeof window !== "undefined") {
+// Registered once (a window flag survives HMR re-eval, so listeners never stack).
+if (typeof window !== "undefined" && !(window as any).__dutyListenersInstalled) {
+  (window as any).__dutyListenersInstalled = true;
   window.addEventListener("storage", (e) => {
     if (e.key === KEY || e.key === null) reconcileFromStorage();
   });

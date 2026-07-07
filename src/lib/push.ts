@@ -31,8 +31,20 @@ export async function reportDevice(): Promise<void> {
  * iOS also requires: the APNs Auth Key uploaded to Firebase → Cloud Messaging,
  * the Push Notifications capability, and a REAL device (never the simulator).
  */
-export async function registerPush(): Promise<void> {
-  if (!Capacitor.isNativePlatform()) return;
+// Cache the in-flight registration so concurrent callers (App.tsx auth change +
+// GuardPermissions) share ONE run — prevents the race where a second call's
+// removeAllListeners() wipes the first call's still-registering listeners, and
+// prevents listener accumulation across auth cycles.
+let registerPromise: Promise<void> | null = null;
+
+export function registerPush(): Promise<void> {
+  if (!Capacitor.isNativePlatform()) return Promise.resolve();
+  if (registerPromise) return registerPromise;
+  registerPromise = doRegisterPush().finally(() => { registerPromise = null; });
+  return registerPromise;
+}
+
+async function doRegisterPush(): Promise<void> {
   try {
     const { FirebaseMessaging } = await import("@capacitor-firebase/messaging");
 
@@ -57,13 +69,15 @@ export async function registerPush(): Promise<void> {
     };
 
     await FirebaseMessaging.removeAllListeners();
+    // Await each addListener so a concurrent removeAllListeners() can't wipe a
+    // half-registered listener.
     // The FCM registration token (re-issued over time → keep the backend in sync).
-    FirebaseMessaging.addListener("tokenReceived", (e: any) => register(e?.token));
+    await FirebaseMessaging.addListener("tokenReceived", (e: any) => register(e?.token));
     // Foreground arrival → fan the payload out so screens can react immediately.
-    FirebaseMessaging.addListener("notificationReceived", (e: any) => emitPush(e?.notification?.data));
+    await FirebaseMessaging.addListener("notificationReceived", (e: any) => emitPush(e?.notification?.data));
     // User tapped a notification (app backgrounded/killed) → surface the payload
     // flagged as a tap so a listener can deep-link (e.g. open the radio screen).
-    FirebaseMessaging.addListener("notificationActionPerformed", (e: any) =>
+    await FirebaseMessaging.addListener("notificationActionPerformed", (e: any) =>
       emitPush({ ...(e?.notification?.data || {}), _tapped: "1" }));
 
     // getToken() registers for remote notifications and returns the FCM token

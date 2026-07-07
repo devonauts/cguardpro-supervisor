@@ -48,7 +48,10 @@ void i18n
 // mode, re-sync to the current device language. Most OSes restart the app on a
 // language change (so per-launch detection already covers it); this catches the
 // cases where the WebView's navigator.language updated without a full restart.
-if (Capacitor.isNativePlatform()) {
+// Registered once (a window flag survives HMR re-eval, so the resume listener
+// never stacks).
+if (Capacitor.isNativePlatform() && !(window as any).__i18nResumeInstalled) {
+  (window as any).__i18nResumeInstalled = true;
   CapacitorApp.addListener("resume", () => {
     if (localStorage.getItem(CHOICE_KEY)) return; // explicit choice — leave it
     const nav = (navigator.language || "es").slice(0, 2);

@@ -41,6 +41,10 @@ export default function StationInspection() {
   const [result, setResult] = useState<"ok" | "issues">("ok");
   const [notes, setNotes] = useState("");
   const [media, setMedia] = useState<Media[]>([]);
+  // Revoke any remaining preview object URLs on unmount (avoid blob leaks).
+  const mediaRef = useRef(media);
+  mediaRef.current = media;
+  useEffect(() => () => { mediaRef.current.forEach((m) => m.previewUrl && URL.revokeObjectURL(m.previewUrl)); }, []);
   const [saving, setSaving] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
@@ -170,7 +174,7 @@ export default function StationInspection() {
         {media.map((m, i) => (
           <div key={i} className={styles.thumb}>
             {m.isVideo ? <video src={m.previewUrl} muted /> : <img src={m.previewUrl} alt="" />}
-            <button type="button" className={styles.thumbDel} onClick={() => setMedia((arr) => arr.filter((_, j) => j !== i))}><X size={12} /></button>
+            <button type="button" className={styles.thumbDel} onClick={() => setMedia((arr) => { const rm = arr[i]; if (rm?.previewUrl) URL.revokeObjectURL(rm.previewUrl); return arr.filter((_, j) => j !== i); })}><X size={12} /></button>
             {m.isVideo && <span className={styles.thumbDel} style={{ top: "auto", bottom: 3, right: "auto", left: 3, background: "rgba(0,0,0,.55)" }}><Play size={11} /></span>}
           </div>
         ))}
