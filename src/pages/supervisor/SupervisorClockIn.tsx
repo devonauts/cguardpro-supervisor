@@ -11,6 +11,7 @@ import {
   Loader2,
   Coffee,
   Play,
+  ArrowRightLeft,
 } from "lucide-react";
 import { Screen } from "@/components/Screen";
 import { Card, ErrorState, SkeletonList, ResultSheet } from "@/components/ui";
@@ -26,6 +27,7 @@ import { pick } from "@/lib/normalize";
 import { fb } from "@/lib/feedback";
 import { StartShiftModal, type ChecklistResult } from "@/components/StartShiftModal";
 import { SelfieClockIn, type SelfieResult } from "@/components/SelfieClockIn";
+import { ClockOutReportModal, type PassdownPayload } from "@/components/ClockOutReportModal";
 import { logError } from "@/lib/errorLog";
 
 /** Is the supervisor currently on duty, across the loose payload shapes. */
@@ -160,10 +162,10 @@ export default function SupervisorClockIn() {
     }
   };
 
-  // ── Observations (clock-out) ────────────────────────────────────────────
-  const [observations, setObservations] = useState("");
+  // ── Clock-out with pase de turno (relevo) ───────────────────────────────
+  const [clockOutOpen, setClockOutOpen] = useState(false);
 
-  const doClockOut = async () => {
+  const doClockOut = async (payload: PassdownPayload) => {
     if (busy) return;
     setBusy(true);
     setSubmitError(null);
@@ -182,10 +184,12 @@ export default function SupervisorClockIn() {
       await supervisorRoute.clockOut({
         latitude,
         longitude,
-        observations: observations.trim() || undefined,
+        observations: payload.summary?.trim() || undefined,
+        passdown: { instructions: payload.instructions || [] },
       });
       setDuty(false); // disconnect the radio on clock-out
       fb.success();
+      setClockOutOpen(false);
       setResult("out");
     } catch (e: any) {
       fb.error();
@@ -246,21 +250,22 @@ export default function SupervisorClockIn() {
           </Card>
 
           <Card className="p-4">
-            <label className="mb-2 block text-sm font-semibold text-ink">
-              {t("supervisor.observations", "Novedades (opcional)")}
-            </label>
-            <textarea
-              value={observations}
-              onChange={(e) => setObservations(e.target.value)}
-              rows={4}
-              placeholder={t("supervisor.observationsPlaceholder", "Escribe cualquier novedad del turno…")}
-              className="w-full resize-none rounded-xl border border-line bg-surface p-3 text-sm text-ink placeholder:text-faint outline-none focus:border-gold/60"
-            />
+            <div className="flex items-center gap-3">
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-surface-2 text-gold">
+                <ArrowRightLeft size={20} />
+              </span>
+              <div className="min-w-0">
+                <p className="text-[15px] font-semibold text-ink">{t("supervisor.passdownTitle", "Pase de turno")}</p>
+                <p className="text-xs text-muted">
+                  {t("supervisor.passdownHint", "Al marcar salida reportarás las novedades y consignas para el siguiente supervisor.")}
+                </p>
+              </div>
+            </div>
           </Card>
 
           {submitError && <p className="text-center text-sm font-medium text-critical">{submitError}</p>}
 
-          <Button variant="danger" full disabled={busy} onClick={doClockOut} className="justify-center gap-2">
+          <Button variant="danger" full disabled={busy} onClick={() => setClockOutOpen(true)} className="justify-center gap-2">
             {busy ? <Loader2 size={20} className="animate-spin" /> : <LogOut size={20} />}
             {t("supervisor.clockOut", "Marcar salida")}
           </Button>
@@ -314,6 +319,15 @@ export default function SupervisorClockIn() {
           if (flowStepRef.current === "selfie") goStep("checklist");
         }}
         onCapture={submitClockIn}
+      />
+
+      {/* Pase de turno (clock-out): novedades + consignas for the next supervisor */}
+      <ClockOutReportModal
+        isOpen={clockOutOpen}
+        busy={busy}
+        error={submitError}
+        onCancel={() => setClockOutOpen(false)}
+        onSubmit={doClockOut}
       />
 
       {/* Success result → back to dashboard */}

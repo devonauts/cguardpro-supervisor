@@ -3,12 +3,12 @@ import { useTranslation } from "react-i18next";
 import { Sheet } from "@/components/ui";
 import { Button } from "@/components/ui/kit";
 import { ClipboardList, ArrowRightLeft, CheckCircle2 } from "lucide-react";
-import { guardService } from "@/lib/services";
+import { supervisorRoute } from "@/lib/supervisorRoute";
 
 /**
- * Shows the pase de turno left by the previous guard at this post, once, when the
- * incoming guard opens the on-duty home. Fetching it marks it received on the backend
- * (so it won't re-surface). The instructions also land in the guard's Tareas.
+ * Shows the pase de turno (relevo) left by the PREVIOUS supervisor, once, when
+ * this supervisor opens the app on duty. Fetching it marks it received on the
+ * backend (so it won't re-surface). Tenant-wide supervisor handover.
  */
 export default function IncomingPassdownGate() {
   const { t } = useTranslation();
@@ -19,7 +19,7 @@ export default function IncomingPassdownGate() {
     let alive = true;
     (async () => {
       try {
-        const res: any = await guardService.incomingPassdown();
+        const res: any = await supervisorRoute.incomingPassdown();
         const passdown = res?.passdown;
         if (alive && passdown) {
           setPd(passdown);
@@ -59,17 +59,16 @@ export default function IncomingPassdownGate() {
         <div className="mb-4">
           <div className="mb-1.5 flex items-center gap-1.5">
             <ClipboardList size={15} className="text-gold" />
-            <span className="label-eyebrow">{t("passdown.instructionsLabel", "Instrucciones para el guardia entrante")}</span>
+            <span className="label-eyebrow">{t("passdown.instructionsLabelSup", "Instrucciones para el supervisor entrante")}</span>
           </div>
           <div className="space-y-2">
-            {pd.instructions.map((ins: any) => (
-              <div key={ins.id} className="flex items-start gap-2 rounded-xl border border-line bg-surface px-3 py-2.5">
+            {pd.instructions.map((ins: any, i: number) => (
+              <div key={ins.id || i} className="flex items-start gap-2 rounded-xl border border-line bg-surface px-3 py-2.5">
                 <CheckCircle2 size={15} className={`mt-0.5 shrink-0 ${prio(ins.priority)}`} />
                 <span className="text-sm text-ink">{ins.taskToDo}</span>
               </div>
             ))}
           </div>
-          <p className="mt-2 text-[11px] text-faint">{t("passdown.instructionsInTasks", "Estas instrucciones también están en tus Tareas.")}</p>
         </div>
       )}
 

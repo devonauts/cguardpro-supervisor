@@ -146,9 +146,13 @@ export const supervisorRoute = {
   clockIn: (body?: unknown) =>
     api.post(tenantPath("/supervisor/me/clock-in"), body).then(unwrap),
 
-  /** Clock out (report/geo in body). */
+  /** Clock out (report/geo/passdown in body). */
   clockOut: (body?: unknown) =>
     api.post(tenantPath("/supervisor/me/clock-out"), body).then(unwrap),
+
+  /** The pase de turno left by the previous supervisor (marks it received). */
+  incomingPassdown: () =>
+    api.get(tenantPath("/supervisor/me/passdown/incoming")).then(unwrap),
 
   /** Start a break on the open shift. */
   breakStart: () =>

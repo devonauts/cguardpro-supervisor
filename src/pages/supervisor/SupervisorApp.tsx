@@ -24,6 +24,7 @@ import GuardDetail from "./GuardDetail";
 import SupervisorIncidents from "./SupervisorIncidents";
 import SupervisorRadio from "./SupervisorRadio";
 import RadioCheckAlert from "@/components/RadioCheckAlert";
+import IncomingPassdownGate from "@/components/IncomingPassdownGate";
 import Emergency from "./Emergency";
 import SupervisorMessages from "./SupervisorMessages";
 import SupervisorThread from "./SupervisorThread";
@@ -133,6 +134,8 @@ export default function SupervisorApp() {
     {/* Global pase-de-novedades popup (push + poll fallback) — same as the worker
         app; without this the supervisor never sees the roll-call response screen. */}
     <RadioCheckAlert />
+    {/* Pase de turno left by the previous supervisor — shown once on entry. */}
+    <IncomingPassdownGate />
     </RadioProvider>
   );
 }
