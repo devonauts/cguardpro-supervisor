@@ -23,6 +23,7 @@ import GuardsList from "./GuardsList";
 import GuardDetail from "./GuardDetail";
 import SupervisorIncidents from "./SupervisorIncidents";
 import SupervisorRadio from "./SupervisorRadio";
+import RadioCheckAlert from "@/components/RadioCheckAlert";
 import Emergency from "./Emergency";
 import SupervisorMessages from "./SupervisorMessages";
 import SupervisorThread from "./SupervisorThread";
@@ -129,6 +130,9 @@ export default function SupervisorApp() {
       <TabBar openIncidents={openIncidents || 0} />
     </IonTabs>
     <FloatingFabs />
+    {/* Global pase-de-novedades popup (push + poll fallback) — same as the worker
+        app; without this the supervisor never sees the roll-call response screen. */}
+    <RadioCheckAlert />
     </RadioProvider>
   );
 }
