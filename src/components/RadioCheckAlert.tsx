@@ -49,7 +49,7 @@ export default function RadioCheckAlert() {
   const handledRef = useRef<Set<string>>(new Set());
   const buzzedRef = useRef<string | null>(null);
 
-  const onRadioScreen = location.pathname.startsWith("/guard/radio");
+  const onRadioScreen = location.pathname.startsWith("/supervisor/radio");
 
   const refresh = useCallback(async () => {
     try {
@@ -71,7 +71,7 @@ export default function RadioCheckAlert() {
     refresh();
     const id = setInterval(refresh, 8000);
     const off = onPush((d: any) => {
-      if (d?.type === "radio.check_request") refresh();
+      if (d?.type === "radio.check_request" || d?.type === "radio.session_started") refresh();
     });
     return () => {
       clearInterval(id);
@@ -290,7 +290,7 @@ export default function RadioCheckAlert() {
               {t("radio.reportByVoice", "Reportar por voz")}
             </button>
             <button
-              onClick={() => { try { resume(); } catch { /* ignore */ } history.push("/guard/radio"); }}
+              onClick={() => { try { resume(); } catch { /* ignore */ } history.push("/supervisor/radio"); }}
               className="flex w-full items-center justify-center gap-1.5 py-1.5 text-xs text-muted active:text-ink"
             >
               <RadioIcon size={14} />
