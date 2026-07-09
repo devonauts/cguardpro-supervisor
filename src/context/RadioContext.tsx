@@ -61,6 +61,15 @@ export function RadioProvider({ children }: { children: ReactNode }) {
   const speakerRef = useRef<VoiceSpeaker>(null);
   speakerRef.current = speaker;
 
+  // Full-restart reconnect: livekit-client retries transient drops itself, but
+  // once it gives up (long background suspension, network handoff) it emits
+  // Disconnected and STAYS down — and its internal retries reuse the original
+  // join token, which the backend only signs for a few hours. Bumping this tick
+  // re-runs the connect effect: a brand-new VoiceChannel that fetches a FRESH
+  // token. Delay doubles 2s→30s between dead attempts, resets once connected.
+  const [reconnectTick, setReconnectTick] = useState(0);
+  const reconnectDelayRef = useRef(2000);
+
   // Track duty changes (clock in/out publishes here).
   useEffect(() => {
     setOnDuty(getDuty());
@@ -101,6 +110,16 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     let alive = true;
     let vc: VoiceChannel | null = null;
     let id: ReturnType<typeof setInterval> | null = null;
+    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    const scheduleReconnect = () => {
+      if (!alive || reconnectTimer) return;
+      const delay = reconnectDelayRef.current;
+      reconnectDelayRef.current = Math.min(30000, delay * 2);
+      reconnectTimer = setTimeout(() => {
+        reconnectTimer = null;
+        if (alive) setReconnectTick((t) => t + 1);
+      }, delay);
+    };
 
     // Defer connect a tick so a synchronous cleanup (React StrictMode double-
     // mount, or a rapid duty toggle) cancels it BEFORE the WS handshake starts —
@@ -111,7 +130,22 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       vcRef.current = vc;
       vc.connect(
         { url: apiOrigin, path: "/api/socket.io", token: getToken() || "", tenantId: getTenantId(), selfId: myId },
-        { onState: setState, onPresence: setRoster, onSpeaker: setSpeaker, onError: (m) => setHint(m) },
+        {
+          // Every callback checks `alive`: after a reconnect restarts the effect,
+          // the OLD room's async Disconnected event must not clobber the state of
+          // the NEW channel that replaced it.
+          onState: (s) => {
+            if (!alive) return;
+            setState(s);
+            if (s === "connected") reconnectDelayRef.current = 2000;
+            // "idle"/"error" while we should still be on the channel means LiveKit
+            // gave up (or the initial connect failed) — restart from scratch.
+            if (s === "idle" || s === "error") scheduleReconnect();
+          },
+          onPresence: (r) => { if (alive) setRoster(r); },
+          onSpeaker: (sp) => { if (alive) setSpeaker(sp); },
+          onError: (m) => { if (alive) setHint(m); },
+        },
       );
       // Keep the app alive in the background (iOS suspends a backgrounded WebView,
       // which would freeze the socket + Web Audio). The native silent loop holds the
@@ -134,11 +168,12 @@ export function RadioProvider({ children }: { children: ReactNode }) {
       alive = false;
       clearTimeout(timer);
       if (id !== null) clearInterval(id);
+      if (reconnectTimer) clearTimeout(reconnectTimer);
       try { vc?.disconnect(); } catch { /* ignore */ }
       stopBackgroundAudio();
       vcRef.current = null;
     };
-  }, [myId, onDuty]);
+  }, [myId, onDuty, reconnectTick]);
 
   // Returning to the foreground after iOS throttled the WebView: the AudioContext
   // is often left "suspended" (silence) and socket.io may be mid-reconnect. Resume
@@ -148,7 +183,16 @@ export function RadioProvider({ children }: { children: ReactNode }) {
     (async () => {
       try {
         sub = await CapApp.addListener("appStateChange", ({ isActive }) => {
-          if (isActive) { try { vcRef.current?.resume(); } catch { /* ignore */ } }
+          if (!isActive) return;
+          try { vcRef.current?.resume(); } catch { /* ignore */ }
+          // If the room died while backgrounded (iOS suspension outlives LiveKit's
+          // reconnect window; timers were frozen so the backoff never ran),
+          // restart NOW with a fresh token instead of waiting for a stale timer.
+          const vc = vcRef.current;
+          if (vc && !vc.connected) {
+            reconnectDelayRef.current = 2000;
+            setReconnectTick((t) => t + 1);
+          }
         });
       } catch { /* not native / no listener */ }
     })();
