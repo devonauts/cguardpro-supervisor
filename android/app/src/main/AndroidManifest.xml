@@ -37,6 +37,8 @@
          @capacitor/geolocation REQUIRES these be declared here (not auto-merged). -->
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
 
     <!-- Camera + photo library: proof photos, selfie clock-in, evidence -->
     <uses-permission android:name="android.permission.CAMERA" />

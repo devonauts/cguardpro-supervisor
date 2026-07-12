@@ -10,6 +10,7 @@ import { registerPush } from "./lib/push";
 import AnimatedSplash from "./components/AnimatedSplash";
 import { StatusBanner } from "./components/StatusBanner";
 import { startDeviceStatus, stopDeviceStatus } from "./lib/deviceStatus";
+import { startLocationReporter } from "./lib/locationReporter";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import SupervisorApp from "./pages/supervisor/SupervisorApp";
@@ -65,6 +66,10 @@ export default function App() {
   // Start network + battery monitoring once for the whole app; tear it down on
   // app unmount (StrictMode-safe — start/stop are idempotent).
   useEffect(() => { startDeviceStatus(); return () => stopDeviceStatus(); }, []);
+
+  // Continuous live-telemetry (background-capable) while the supervisor is on
+  // duty — self-manages start/stop on duty changes; runs once for the app.
+  useEffect(() => { startLocationReporter(); }, []);
 
   // Android hardware back button: navigate back through the router history when a
   // stack exists, otherwise minimize instead of dumping the user out of the app.
