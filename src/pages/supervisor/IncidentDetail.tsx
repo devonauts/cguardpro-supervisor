@@ -81,6 +81,15 @@ export default function IncidentDetail() {
   const i = data;
   const reporterAvatar = useFileUrl(i?.reportedBy?.avatar || null);
 
+  // incidentType can arrive as the ASSOCIATION OBJECT ({ name }) or a plain
+  // string depending on the endpoint — extract the string either way (raw
+  // objects as children crash React / render [object Object]).
+  const typeName = (inc: any): string | null => {
+    const v = inc?.incidentType;
+    if (typeof v === "string") return v;
+    return v?.name || v?.title || inc?.incidentTypeName || null;
+  };
+
   const act = async (fn: () => Promise<any>, okMsg: string) => {
     if (busy) return;
     setBusy(true);
@@ -223,7 +232,7 @@ export default function IncidentDetail() {
         </div>
         <div className={styles.infoCol}>
           <div className={styles.infoTop}><Tag size={13} style={{ color: "#8b5cf6" }} /><span className={styles.infoLabel}>{t("incidentDetail.type", "Tipo")}</span></div>
-          <span className={styles.infoVal}>{i.incidentType || "—"}</span>
+          <span className={styles.infoVal}>{typeName(i) || "—"}</span>
           <span className={styles.infoSub}>{i.title}</span>
         </div>
       </div>
@@ -272,7 +281,7 @@ export default function IncidentDetail() {
         {tab === "details" && (
           <div className={`${styles.card} p-4`}>
             <p className={styles.sumText}>{i.details?.description || i.summary?.text || t("incidentDetail.noSummary", "Sin descripción")}</p>
-            <div className={styles.sumRow}><span className={styles.sumLabel}>{t("incidentDetail.type", "Tipo")}</span><span className={styles.sumVal}>{i.incidentType || "—"}</span></div>
+            <div className={styles.sumRow}><span className={styles.sumLabel}>{t("incidentDetail.type", "Tipo")}</span><span className={styles.sumVal}>{typeName(i) || "—"}</span></div>
             <div className={styles.sumRow}><span className={styles.sumLabel}>{t("incidentDetail.reportedBy", "Reportado por")}</span><span className={styles.sumVal}>{i.reportedBy?.name || i.details?.caller || "—"}</span></div>
             {i.details?.actionsTaken && (
               <div className="border-t border-line pt-3">
