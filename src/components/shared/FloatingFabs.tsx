@@ -144,7 +144,7 @@ export function FloatingFabs() {
         {openKey === "sos" && <Emergency onClose={close} />}
       </IonModal>
 
-      <IonModal isOpen={openKey === "radio"} onDidDismiss={close} breakpoints={[0, 1]} initialBreakpoint={1} handle className={styles.sheet}>
+      <IonModal isOpen={openKey === "radio"} onDidDismiss={close} breakpoints={[0, 1]} initialBreakpoint={1} handle className={styles.sheetDark}>
         {openKey === "radio" && <SupervisorRadio onClose={close} />}
       </IonModal>
     </>

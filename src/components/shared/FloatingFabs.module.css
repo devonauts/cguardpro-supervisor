@@ -61,5 +61,5 @@
 /* iOS-style dismissable sheets: rounded top, visible handle. */
 .sheet::part(handle) { background: rgba(255, 255, 255, 0.35); width: 40px; height: 5px; }
 .sheet::part(content) { border-radius: 18px 18px 0 0; background: #0a0708; overflow: hidden; }
-.sheetDark::part(handle) { background: rgba(255, 255, 255, 0.3); width: 40px; height: 5px; }
+.sheetDark::part(handle) { background: color-mix(in srgb, var(--muted) 55%, transparent); width: 40px; height: 5px; }
 .sheetDark::part(content) { border-radius: 18px 18px 0 0; background: var(--background); overflow: hidden; }

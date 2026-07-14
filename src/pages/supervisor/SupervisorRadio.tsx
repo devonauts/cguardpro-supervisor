@@ -44,6 +44,10 @@ export default function SupervisorRadio({ onClose }: { onClose?: () => void } = 
   const [speakerOn, setSpeakerOn] = useState(true);
   const [monitor, setMonitor] = useState(false);
   const [txs, setTxs] = useState<Tx[]>([]);
+  // Local held-state so the PTT button turns red the instant the finger goes
+  // down, without waiting on the async LiveKit `talking` flag (which lags the
+  // physical press and could leave the button un-red while transmitting).
+  const [pressed, setPressed] = useState(false);
   const lastSpeaker = useRef<string | null>(null);
 
   useIonViewWillEnter(() => setScreenActive(true));
@@ -77,10 +81,12 @@ export default function SupervisorRadio({ onClose }: { onClose?: () => void } = 
     if (connecting || someoneElseTalking) return;
     try { (e.currentTarget as any).setPointerCapture?.(e.pointerId); } catch { /* ignore */ }
     fb.press();
+    setPressed(true);
     pressTalk();
   };
   const onPttUp = (e: React.PointerEvent) => {
     try { (e.currentTarget as any).releasePointerCapture?.(e.pointerId); } catch { /* ignore */ }
+    setPressed(false);
     releaseTalk();
   };
 
@@ -143,7 +149,7 @@ export default function SupervisorRadio({ onClose }: { onClose?: () => void } = 
                       onPointerDown={onPttDown} onPointerUp={onPttUp} onPointerCancel={onPttUp}
                       onContextMenu={(e) => e.preventDefault()}
                       disabled={!onDuty || connecting || someoneElseTalking}
-                      className={`no-press ${styles.pttBtn} ${talking ? styles.pttTalking : ""}`}
+                      className={`no-press ${styles.pttBtn} ${talking || pressed ? styles.pttTalking : ""}`}
                       aria-label={t("radio.holdToTalk", "Mantén para hablar")}
                     >
                       <Mic size={54} strokeWidth={2.2} />
@@ -156,7 +162,7 @@ export default function SupervisorRadio({ onClose }: { onClose?: () => void } = 
                   </button>
                 </div>
                 <div className="mt-2 text-center">
-                  <p className={styles.pttLabel}>{talking ? t("radio.transmitting", "Transmitiendo…") : someoneElseTalking ? t("radio.channelBusy", "Canal ocupado") : t("radio.pushToTalk", "Presiona para hablar")}</p>
+                  <p className={styles.pttLabel}>{talking || pressed ? t("radio.transmitting", "Transmitiendo…") : someoneElseTalking ? t("radio.channelBusy", "Canal ocupado") : t("radio.pushToTalk", "Presiona para hablar")}</p>
                   <p className={styles.pttHint}>{!onDuty ? t("radio.offDutyHint", "Marca tu entrada para conectarte") : connecting ? t("radio.connecting", "Conectando…") : hint || t("radio.holdToSpeak", "Mantén para hablar")}</p>
                 </div>
               </div>

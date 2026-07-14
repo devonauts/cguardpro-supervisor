@@ -34,14 +34,23 @@
   position: relative; flex-shrink: 0;
   width: min(184px, 46vw); height: auto; aspect-ratio: 1 / 1; border-radius: 50%;
   display: grid; place-items: center;
-  background: radial-gradient(circle at 50% 45%, #23262e, #14161b);
+  /* Theme-aware surface so the button follows light/dark instead of a fixed
+     dark gradient (which looked wrong on the light theme). */
+  background: radial-gradient(circle at 50% 45%, var(--surface-2), var(--surface));
   border: 3px solid var(--gold);
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--gold) 10%, transparent), 0 0 60px -6px color-mix(in srgb, var(--gold) 55%, transparent);
   color: var(--gold);
   touch-action: none; user-select: none; -webkit-user-select: none;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease, color 120ms ease;
 }
 .pttBtn:disabled { opacity: 0.55; }
-.pttTalking { border-color: var(--critical); color: #fff; box-shadow: 0 0 0 6px color-mix(in srgb, var(--critical) 18%, transparent), 0 0 70px -4px color-mix(in srgb, var(--critical) 60%, transparent); }
+/* Held / transmitting: a solid red button (not just a red ring) so the
+   press-to-talk state is unmistakable. */
+.pttTalking {
+  background: radial-gradient(circle at 50% 45%, var(--critical), color-mix(in srgb, var(--critical) 62%, #000));
+  border-color: var(--critical); color: #fff;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--critical) 22%, transparent), 0 0 70px -4px color-mix(in srgb, var(--critical) 60%, transparent);
+}
 .pttLabel { font-size: 18px; font-weight: 800; color: var(--gold); margin-top: 0.4rem; }
 .pttHint { font-size: 13px; color: var(--muted); }
 .sideBtn { display: flex; flex-direction: column; align-items: center; gap: 0.4rem; }
