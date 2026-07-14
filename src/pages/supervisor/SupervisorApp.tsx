@@ -1,6 +1,6 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Redirect, Route, useHistory } from "react-router-dom";
-import { IonTabs, IonRouterOutlet } from "@ionic/react";
+import { IonTabs, IonRouterOutlet, IonModal } from "@ionic/react";
 import { RadioProvider } from "@/context/RadioContext";
 import { onPush } from "@/lib/pushEvents";
 import { routeForNotification } from "@/components/NotificationCenter";
@@ -60,6 +60,26 @@ import UniformInspection from "./UniformInspection";
  * Incidents · Profile. The vehicle-patrol route flow keeps its routes registered
  * (reachable via Más / deep links) but is no longer a primary tab.
  */
+/**
+ * Radio as a route: present the SAME dismissable bottom sheet the FAB uses
+ * (swipe-down handle) instead of a full-screen page, so deep-links / navigation
+ * to /supervisor/radio can be swiped away like an iOS sheet. Leaving the sheet
+ * pops back to wherever the user came from.
+ */
+function RadioSheetRoute() {
+  const history = useHistory();
+  const [open, setOpen] = useState(true);
+  const leave = () => {
+    if (history.length > 1) history.goBack();
+    else history.replace("/supervisor/dashboard");
+  };
+  return (
+    <IonModal isOpen={open} onDidDismiss={leave} breakpoints={[0, 1]} initialBreakpoint={1} handle>
+      {open && <SupervisorRadio onClose={() => setOpen(false)} />}
+    </IonModal>
+  );
+}
+
 export default function SupervisorApp() {
   const history = useHistory();
 
@@ -108,7 +128,7 @@ export default function SupervisorApp() {
         <Route exact path="/supervisor/stations/:stationId" component={StationDetail} />
         <Route exact path="/supervisor/guards" component={GuardsList} />
         <Route exact path="/supervisor/guards/:guardId" component={GuardDetail} />
-        <Route exact path="/supervisor/radio" component={SupervisorRadio} />
+        <Route exact path="/supervisor/radio" component={RadioSheetRoute} />
         <Route exact path="/supervisor/emergency" component={Emergency} />
         <Route exact path="/supervisor/incidents" component={SupervisorIncidents} />
         <Route exact path="/supervisor/incidents/:incidentId" component={IncidentDetail} />

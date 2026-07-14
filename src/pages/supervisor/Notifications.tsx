@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import {
-  Settings, SlidersHorizontal, MoreHorizontal, ChevronRight,
+  ChevronRight,
   AlertOctagon, Clock, MapPinOff, UserRound, CheckCircle2, ClipboardList,
   ShieldAlert, ShieldCheck, TrendingUp, LogOut, Bell,
 } from "lucide-react";
@@ -67,7 +67,7 @@ export default function Notifications() {
   const { t } = useTranslation();
   const history = useHistory();
   const { role } = useAuth();
-  const { items, loading, error, refresh, markRead, markAllRead } = useNotifications();
+  const { items, loading, error, refresh, markRead } = useNotifications();
   const [cat, setCat] = useState<Cat>("all");
 
   const counts = useMemo(() => {
@@ -107,16 +107,8 @@ export default function Notifications() {
     ["system", t("notif.system", "Sistema"), counts.system, "#6b7280"],
   ];
 
-  const right = (
-    <div className="flex items-center gap-0.5">
-      <button type="button" aria-label={t("notif.markAll", "Marcar todo")} onClick={() => { fb.tap(); markAllRead(); }} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><Settings size={20} /></button>
-      <button type="button" aria-label={t("guards.filters", "Filtros")} onClick={() => fb.tap()} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><SlidersHorizontal size={20} /></button>
-      <button type="button" aria-label={t("guards.more", "Más")} onClick={() => fb.tap()} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><MoreHorizontal size={20} /></button>
-    </div>
-  );
-
   return (
-    <Screen largeTitle={t("notif.title", "Notificaciones")} right={right} back flush onRefresh={refresh}>
+    <Screen largeTitle={t("notif.title", "Notificaciones")} back flush onRefresh={refresh}>
         {/* Tabs */}
         <div className={`${styles.tabs} mt-1`}>
           {TABS.map(([key, label, count, color]) => (
