@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Crosshair, Layers } from "lucide-react";
@@ -45,7 +45,7 @@ function pinIcon(cp: Checkpoint): L.DivIcon {
 
 function guardIcon(g: GuardLoc): L.DivIcon {
   const inner = g.avatarUrl
-    ? `<img src="${esc(g.avatarUrl)}" alt="" />`
+    ? `<img src="${esc(g.avatarUrl)}" alt="" decoding="async" loading="lazy" />`
     : `<svg viewBox="0 0 24 24" fill="#fff" width="16" height="16"><circle cx="12" cy="8" r="3.4"/><path d="M5.5 20a6.5 6.5 0 0 1 13 0"/></svg>`;
   return L.divIcon({
     className: "guard-mk-wrap",
@@ -63,7 +63,7 @@ function guardIcon(g: GuardLoc): L.DivIcon {
  * threads a blue OSRM route through them (straight-leg fallback), and drops a
  * ringed guard-location marker. Floating recenter + light/dark toggle controls.
  */
-export function PatrolMap({ checkpoints, guard = null, height = 220, className = "" }: Props) {
+function PatrolMapImpl({ checkpoints, guard = null, height = 220, className = "" }: Props) {
   const { theme } = useTheme();
   const elRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<L.Map | null>(null);
@@ -75,23 +75,39 @@ export function PatrolMap({ checkpoints, guard = null, height = 220, className =
 
   /* ------------------------------------------------------------- init */
   useEffect(() => {
-    if (!elRef.current || mapRef.current) return;
-    const map = L.map(elRef.current, {
-      zoomControl: false,
-      attributionControl: false,
-      scrollWheelZoom: false,
-    }).setView([-2.1709, -79.9224], 14);
+    const el = elRef.current;
+    if (!el || mapRef.current) return;
+    // Ionic keeps pages in the DOM across transitions; if a prior Leaflet
+    // instance's teardown didn't fully clear this node, `L.map()` throws
+    // "Map container is already initialized" — which, uncaught in an effect,
+    // bubbles to the app error boundary. Clear the stale id defensively, and
+    // fail soft on any init error so a map hiccup never crashes the screen.
+    if ((el as any)._leaflet_id) { try { delete (el as any)._leaflet_id; } catch { /* ignore */ } }
+    let map: L.Map;
+    try {
+      map = L.map(el, {
+        zoomControl: false,
+        attributionControl: false,
+        scrollWheelZoom: false,
+        // detectRetina quadruples tile memory on retina phones (2× tiles at 2×
+        // res); with several Leaflet maps alive across the app that pushes the
+        // WKWebView over its memory cap and iOS kills + relaunches the app.
+        preferCanvas: true,
+      }).setView([-2.1709, -79.9224], 14);
+    } catch {
+      return;
+    }
     mapRef.current = map;
     tileRef.current = L.tileLayer(dark ? BASEMAP.dark : BASEMAP.light, {
       subdomains: BASEMAP.subdomains,
       maxZoom: BASEMAP.maxZoom,
-      detectRetina: true,
+      detectRetina: false,
       crossOrigin: true,
     }).addTo(map);
-    const t = setTimeout(() => map.invalidateSize(), 200);
+    const t = setTimeout(() => { try { map.invalidateSize(); } catch { /* detached */ } }, 200);
     return () => {
       clearTimeout(t);
-      map.remove();
+      try { map.remove(); } catch { /* already gone */ }
       mapRef.current = null;
       tileRef.current = null;
     };
@@ -102,14 +118,16 @@ export function PatrolMap({ checkpoints, guard = null, height = 220, className =
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
-    if (tileRef.current) tileRef.current.remove();
-    tileRef.current = L.tileLayer(dark ? BASEMAP.dark : BASEMAP.light, {
-      subdomains: BASEMAP.subdomains,
-      maxZoom: BASEMAP.maxZoom,
-      detectRetina: true,
-      crossOrigin: true,
-    }).addTo(map);
-    tileRef.current.bringToBack();
+    try {
+      if (tileRef.current) tileRef.current.remove();
+      tileRef.current = L.tileLayer(dark ? BASEMAP.dark : BASEMAP.light, {
+        subdomains: BASEMAP.subdomains,
+        maxZoom: BASEMAP.maxZoom,
+        detectRetina: false,
+        crossOrigin: true,
+      }).addTo(map);
+      tileRef.current.bringToBack();
+    } catch { /* map torn down mid-swap */ }
   }, [dark]);
 
   // Follow the app theme when it changes.
@@ -120,6 +138,7 @@ export function PatrolMap({ checkpoints, guard = null, height = 220, className =
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
+    try {
     layersRef.current.forEach((l) => l.remove());
     layersRef.current = [];
 
@@ -166,6 +185,7 @@ export function PatrolMap({ checkpoints, guard = null, height = 220, className =
     }
 
     if (bounds.isValid()) map.fitBounds(bounds.pad(0.28), { animate: false, maxZoom: 16 });
+    } catch { /* map torn down / detached mid-update */ }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(valid.map((c) => [c.lat, c.lng, c.status])), guard?.lat, guard?.lng]);
 
@@ -197,5 +217,12 @@ export function PatrolMap({ checkpoints, guard = null, height = 220, className =
     </div>
   );
 }
+
+/**
+ * Memoized so the Guard Detail screen's 1-second telemetry clock (which
+ * re-renders the parent every tick) doesn't re-render the map — the parent
+ * passes a referentially-stable `checkpoints` (useMemo) and `guard` (useMemo).
+ */
+export const PatrolMap = memo(PatrolMapImpl);
 
 export default PatrolMap;

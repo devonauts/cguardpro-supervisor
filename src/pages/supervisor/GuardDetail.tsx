@@ -208,7 +208,7 @@ function DetailAvatar({ name, url, status, size = 72 }: { name: string; url: str
       <span className="grid h-full w-full place-items-center overflow-hidden rounded-full bg-surface-2 text-base font-bold text-muted ring-2 ring-line">
         {url ? (
           // eslint-disable-next-line jsx-a11y/alt-text
-          <img src={url} className="h-full w-full object-cover" />
+          <img src={url} className="h-full w-full object-cover" decoding="async" loading="lazy" />
         ) : (
           initials || <UserIcon size={size * 0.4} />
         )}
@@ -339,6 +339,15 @@ export default function GuardDetail() {
 
   const g = data;
   const avatarUrl = g ? fileUrlFromFile(g.avatar) : null;
+
+  // Stable identity for the map's guard marker so the 1-second telemetry clock
+  // (which re-renders this screen every tick) doesn't re-render the map.
+  const gLat = toNum(g?.lat);
+  const gLng = toNum(g?.lng);
+  const mapGuard = useMemo(
+    () => (gLat != null && gLng != null ? { lat: gLat, lng: gLng, name: g?.name, avatarUrl } : null),
+    [gLat, gLng, g?.name, avatarUrl],
+  );
 
   const mapPoints: Checkpoint[] = useMemo(() => {
     const cps: any[] = Array.isArray(g?.checkpoints) ? g.checkpoints : [];
@@ -493,15 +502,7 @@ export default function GuardDetail() {
 
       {/* Map */}
       <div className="mt-4">
-        <PatrolMap
-          checkpoints={mapPoints}
-          guard={
-            hasCoords
-              ? { lat: toNum(g.lat) as number, lng: toNum(g.lng) as number, name: g.name, avatarUrl }
-              : null
-          }
-          height={220}
-        />
+        <PatrolMap checkpoints={mapPoints} guard={mapGuard} height={220} />
       </div>
 
       {/* Action grid */}
