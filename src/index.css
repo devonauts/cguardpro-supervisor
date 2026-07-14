@@ -439,7 +439,10 @@ ion-modal::part(content) {
 
 /* Respect device safe areas (notch / home indicator) inside Capacitor */
 .safe-top {
-  padding-top: env(safe-area-inset-top);
+  /* safe-area inset PLUS the height of any visible StatusBanner strips, so page
+     headers sit below the fixed banner instead of behind it (--status-banner-h
+     is published by StatusBanner; 0 when no banner is showing). */
+  padding-top: calc(env(safe-area-inset-top) + var(--status-banner-h, 0px));
 }
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);

@@ -279,17 +279,26 @@ export function routeForNotification(
   const convoId = d.conversationId ?? d.conversation_id ?? d.threadId ?? d.thread_id;
 
   if (role === SUPERVISOR_ROLE) {
-    // Supervisors only have a subset of destinations. Anything without a real
-    // supervisor route returns null (no navigation).
-    switch (family) {
-      case "incident":
-        return "/supervisor/incidents";
-      case "shift":
-        return "/supervisor/schedule";
-      default:
-        // message / radio_check / attendance have no supervisor screen.
-        return null;
+    // Match on the FULL event type — supervisor events are prefixed
+    // (`supervisor.incident.assigned`, `panic.alert`, `supervisor.route.eta`…),
+    // so keying on the first segment (`family`) missed nearly all of them and
+    // taps did nothing. SOS/panic/any incident → the incident DETAIL (it loads
+    // by id and has Resolve), using the incidentId the push carries.
+    const t = (n.type || "").toLowerCase();
+    const incidentId = d.incidentId ?? d.incident_id ?? d.entityId ?? d.entity_id;
+    if (/panic|sos|emergenc|incident/.test(t)) {
+      return incidentId ? `/supervisor/incidents/${incidentId}` : "/supervisor/incidents";
     }
+    if (t.includes("route") || t.endsWith("eta")) {
+      const rid = d.routeId ?? d.route_id;
+      return rid ? `/supervisor/route/${rid}` : "/supervisor/route";
+    }
+    if (t.includes("visitor")) return "/supervisor/visitors";
+    if (t.includes("radio")) return "/supervisor/radio";
+    if (t.includes("schedule") || t.includes("shift")) return "/supervisor/schedule";
+    if (t.includes("message") || convoId) return convoId ? `/supervisor/messages/${convoId}` : "/supervisor/messages";
+    // Anything else has no supervisor destination → no navigation.
+    return null;
   }
 
   // Guard (default).

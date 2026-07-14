@@ -1,6 +1,10 @@
-import { Redirect, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { Redirect, Route, useHistory } from "react-router-dom";
 import { IonTabs, IonRouterOutlet } from "@ionic/react";
 import { RadioProvider } from "@/context/RadioContext";
+import { onPush } from "@/lib/pushEvents";
+import { routeForNotification } from "@/components/NotificationCenter";
+import { SUPERVISOR_ROLE } from "@/lib/roles";
 import { TabBar } from "@/components/shared/TabBar";
 import { SideMenu } from "@/components/shared/SideMenu";
 import { FloatingFabs } from "@/components/shared/FloatingFabs";
@@ -57,6 +61,26 @@ import UniformInspection from "./UniformInspection";
  * (reachable via Más / deep links) but is no longer a primary tab.
  */
 export default function SupervisorApp() {
+  const history = useHistory();
+
+  // Deep-link on notification TAP (system-tray push while backgrounded/killed):
+  // land the supervisor on the relevant screen — an SOS/incident push opens the
+  // incident DETAIL (which loads by id + can Resolve), a route push the route,
+  // etc. Mirrors the guard shell, which previously had this and the supervisor
+  // didn't (so supervisor taps just opened the app on the dashboard).
+  useEffect(() => {
+    return onPush((d: any) => {
+      if (!d || d._tapped !== "1") return;
+      // Explicit backend-provided route wins; else derive from the event type.
+      const explicit = typeof d.route === "string" && d.route.startsWith("/supervisor/") ? d.route : null;
+      const route = explicit || routeForNotification(
+        { id: "", type: d.type, title: "", body: "", data: d, read: false, createdAt: "" } as any,
+        SUPERVISOR_ROLE as any,
+      );
+      if (route) { try { fb.tap(); } catch { /* ignore */ } history.push(route); }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Open-incident badge for the Incidents tab (best-effort; no badge on error).
   const { data: openIncidents } = useAsync(async () => {
