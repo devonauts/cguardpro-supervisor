@@ -1,8 +1,10 @@
-// Roles allowed to use the worker app. Only field guards and supervisors.
+// Roles allowed to use the supervisor app. SUPERVISORS ONLY — guards use the
+// worker app, admins use the CRM. The backend also enforces this
+// (app:'supervisor' only accepts securitySupervisor); this is the client mirror.
 export const GUARD_ROLE = "securityGuard";
 export const SUPERVISOR_ROLE = "securitySupervisor";
 
-export const ALLOWED_ROLES = [GUARD_ROLE, SUPERVISOR_ROLE] as const;
+export const ALLOWED_ROLES = [SUPERVISOR_ROLE] as const;
 export type WorkerRole = (typeof ALLOWED_ROLES)[number];
 
 const normalize = (r: any): string => {
