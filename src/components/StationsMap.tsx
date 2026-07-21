@@ -113,6 +113,18 @@ export function StationsMap({ stations, filter = null, onSelect, onOpenDetail, o
 
     const t = setTimeout(() => map.invalidateSize(), 200);
 
+    // Keep the map sized to its container. A one-shot invalidateSize isn't
+    // enough: an in-app language switch (or any parent re-layout) resizes the
+    // container and Leaflet, unaware, collapsed the tiles to a sliver until an
+    // app restart. A ResizeObserver re-fits it on every container size change.
+    let ro: ResizeObserver | undefined;
+    try {
+      ro = new ResizeObserver(() => {
+        if (mapRef.current) mapRef.current.invalidateSize();
+      });
+      ro.observe(elRef.current);
+    } catch { /* ResizeObserver unavailable — the 200ms one-shot still runs */ }
+
     // Best-effort one-shot fix on my location.
     getCurrentPosition()
       .then((c) => {
@@ -123,6 +135,7 @@ export function StationsMap({ stations, filter = null, onSelect, onOpenDetail, o
 
     return () => {
       clearTimeout(t);
+      try { ro?.disconnect(); } catch { /* ignore */ }
       map.remove();
       mapRef.current = null;
       meRef.current = null;

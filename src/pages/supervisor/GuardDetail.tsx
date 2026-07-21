@@ -201,9 +201,19 @@ function ActionTile({
 
 /* --------------------------------------------------------------- avatar */
 
-function DetailAvatar({ name, url, status, size = 72 }: { name: string; url: string | null; status: string; size?: number }) {
+function DetailAvatar({ name, url, status, size = 72 }: { name?: string | null; url: string | null; status: string; size?: number }) {
   const dot = status === "on_duty" ? "bg-online" : status === "offline" ? "bg-critical" : "bg-low";
-  const initials = name.split(/\s+/).slice(0, 2).map((p) => p[0]).join("").toUpperCase();
+  // Defensive: `name` can be undefined on the first render before the guard
+  // payload resolves — `name.split()` on undefined crashed the whole screen
+  // ("Cannot read properties of undefined (reading 'split')").
+  const initials = String(name || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0] || "")
+    .join("")
+    .toUpperCase() || "?";
   return (
     <span className="relative shrink-0" style={{ width: size, height: size }}>
       <span className="grid h-full w-full place-items-center overflow-hidden rounded-full bg-surface-2 text-base font-bold text-muted ring-2 ring-line">

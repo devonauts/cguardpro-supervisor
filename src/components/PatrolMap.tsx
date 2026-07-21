@@ -105,8 +105,16 @@ function PatrolMapImpl({ checkpoints, guard = null, height = 220, className = ""
       crossOrigin: true,
     }).addTo(map);
     const t = setTimeout(() => { try { map.invalidateSize(); } catch { /* detached */ } }, 200);
+    // Re-fit on any container resize (e.g. in-app language switch re-layout),
+    // which otherwise collapses Leaflet tiles to a sliver until app restart.
+    let ro: ResizeObserver | undefined;
+    try {
+      ro = new ResizeObserver(() => { if (mapRef.current) try { mapRef.current.invalidateSize(); } catch { /* detached */ } });
+      ro.observe(el);
+    } catch { /* unavailable */ }
     return () => {
       clearTimeout(t);
+      try { ro?.disconnect(); } catch { /* ignore */ }
       try { map.remove(); } catch { /* already gone */ }
       mapRef.current = null;
       tileRef.current = null;
