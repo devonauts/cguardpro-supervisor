@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { MapPin, ExternalLink, Clock, User, FileText } from "lucide-react";
+import { MapPin, ExternalLink, Clock, User, FileText, ImageIcon } from "lucide-react";
 import { Card, SeverityBadge, StatusBadge, Sheet, ResultSheet } from "./ui";
 import { Button } from "./ui/kit";
 import {
@@ -67,13 +67,23 @@ export function IncidentRow({
 /* ------------------------------------------------------------------ */
 function IncidentPhoto({ file }: { file: any }) {
   const url = useFileUrl(file);
-  if (!url) return null;
+  // If the token/download URL fails to load, show a placeholder tile instead of
+  // a black/broken image box.
+  const [failed, setFailed] = useState(false);
+  if (!url || failed) {
+    return (
+      <span className="grid h-20 w-20 shrink-0 place-items-center rounded-xl border border-line bg-surface-2 text-muted">
+        <ImageIcon size={18} />
+      </span>
+    );
+  }
   return (
     <a href={url} target="_blank" rel="noreferrer" className="block shrink-0">
       <img
         src={url}
         alt=""
         className="h-20 w-20 rounded-xl border border-line object-cover"
+        onError={() => setFailed(true)}
       />
     </a>
   );

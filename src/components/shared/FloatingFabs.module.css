@@ -11,6 +11,11 @@
   -webkit-user-select: none;
   cursor: grab;
   will-change: left, top;
+  /* Only the round buttons should intercept touches — the wrapper (and the 12px
+   * gap between the buttons + the square corners around each circle) must let
+   * taps fall through to the content behind, so the FABs never block the
+   * "Ordenar" control, station-card edges, or other actionable UI. */
+  pointer-events: none;
 }
 .cluster:active { cursor: grabbing; }
 
@@ -23,6 +28,9 @@
   place-items: center;
   color: #fff;
   font-weight: 900;
+  /* Re-enable hit-testing on the buttons themselves (wrapper is none). */
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 /* SOS — red, emergency. */

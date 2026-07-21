@@ -156,9 +156,22 @@ export default function StationDetail() {
   const [tab, setTab] = useState<Tab>("overview");
   const [me, setMe] = useState<[number, number] | null>(null);
   const [incidentOpen, setIncidentOpen] = useState(false);
+  // Cap the preview-map height to a slice of the viewport so the hero above and
+  // the tabs below always leave a non-map surface to grab for scrolling — on a
+  // tall tablet a fixed-tall map could otherwise fill the fold and (because
+  // Leaflet claims drags) trap the page scroll before the tabs are reachable.
+  const [mapH, setMapH] = useState(() =>
+    Math.max(180, Math.min(240, Math.round((typeof window !== "undefined" ? window.innerHeight : 720) * 0.32))),
+  );
 
   useEffect(() => {
     getCurrentPosition().then((c) => setMe([c.latitude, c.longitude])).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => setMapH(Math.max(180, Math.min(240, Math.round(window.innerHeight * 0.32))));
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
   }, []);
 
   const { data, loading, error, reload } = useAsync(
@@ -283,8 +296,9 @@ export default function StationDetail() {
         </div>
       </div>
 
-      {/* Map */}
-      <div className="mt-4">
+      {/* Map — vertical page-scroll gestures pass through (see .mapHolder) so the
+          tabs below are always reachable, on phone and tablet alike. */}
+      <div className={`${styles.mapHolder} mt-4`}>
         <StationMap
           lat={toNum(s.lat)}
           lng={toNum(s.lng)}
@@ -292,7 +306,7 @@ export default function StationDetail() {
           geofence={s.geofence || []}
           geofenceRadius={toNum(s.geofenceRadius)}
           checkpoints={(checkpoints || []).map((c) => ({ lat: toNum(c.lat) as number, lng: toNum(c.lng) as number, name: c.name, scanned: c.scanned }))}
-          height={240}
+          height={mapH}
         />
       </div>
 

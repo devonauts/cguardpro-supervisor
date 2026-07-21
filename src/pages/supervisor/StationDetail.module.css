@@ -71,6 +71,15 @@
   font-weight: 700;
 }
 
+/* ---- map holder ----
+ * The preview map is informational, not a full pan/zoom surface here. Let the
+ * browser own VERTICAL gestures over it (touch-action: pan-y) so a swipe that
+ * starts on the map still scrolls the page down to the tabs/content below,
+ * instead of Leaflet swallowing it. Tap controls + horizontal drag still work. */
+.mapHolder :global(.leaflet-container) {
+  touch-action: pan-y !important;
+}
+
 /* ---- segmented tabs ---- */
 .tabs {
   display: flex;

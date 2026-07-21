@@ -20,7 +20,9 @@
     "remove": "Quitar",
     "yes": "Sí",
     "no": "No",
-    "back": "Atrás"
+    "back": "Atrás",
+    "on": "Activado",
+    "off": "Desactivado"
   },
   "auth": {
     "signIn": "Iniciar sesión",
@@ -60,7 +62,8 @@
     "route": "Ruta",
     "team": "Equipo",
     "radio": "Radio",
-    "menu": "Menú"
+    "menu": "Menú",
+    "messages": "Mensajes"
   },
   "guards": {
     "title": "Vigilantes",
@@ -110,6 +113,9 @@
     "sortBy": "Ordenar",
     "byStatus": "Estado",
     "empty": "No hay estaciones que mostrar"
+  },
+  "attendance": {
+    "title": "Asistencia"
   },
   "incidentDetail": {
     "title": "Detalle del incidente",
@@ -606,6 +612,7 @@
   "onduty": {
     "liveAlerts": "Novedades",
     "active": "En servicio",
+    "onDuty": "En turno",
     "timeOnDuty": "Tiempo en servicio",
     "insideArea": "Dentro del área del puesto",
     "stationFeatures": "Controles del puesto",
@@ -837,7 +844,38 @@
     "takeSelfie": "Tomar selfie",
     "choosePhoto": "Elegir de galería",
     "removePhoto": "Quitar foto",
-    "photoError": "No se pudo subir la foto. Intenta de nuevo."
+    "photoError": "No se pudo subir la foto. Intenta de nuevo.",
+    "settings": "Ajustes",
+    "roleSupervisor": "Supervisor de Seguridad",
+    "roleGuard": "Oficial de Seguridad",
+    "noStation": "Sin puesto asignado",
+    "employeeId": "ID de empleado",
+    "status": "Estado",
+    "offDuty": "Fuera",
+    "joined": "Ingreso",
+    "phone": "Teléfono",
+    "performance": "Resumen de desempeño",
+    "metricPatrols": "Rondas completas",
+    "metricCompliance": "Cumplimiento",
+    "metricPunctuality": "Puntualidad",
+    "metricScore": "Calificación",
+    "groupAccount": "Mi cuenta",
+    "personalInfo": "Información personal",
+    "personalInfoSub": "Actualiza tus datos de contacto",
+    "scheduleSub": "Tus próximos turnos",
+    "noticesSub": "Memos y comunicados",
+    "timeOff": "Tiempo libre",
+    "timeOffSub": "Saldo y solicitudes",
+    "groupDevice": "Dispositivo y app",
+    "permissions": "Permisos del dispositivo",
+    "permissionsSub": "Ubicación, cámara, micrófono y notificaciones",
+    "languageSub": "Español / English",
+    "sounds": "Sonidos y vibración",
+    "soundsSub": "Tonos y haptics de la app",
+    "diagnostics": "Diagnóstico",
+    "diagnosticsSub": "Registro de errores del dispositivo",
+    "logsCount": "registros",
+    "noLogs": "Sin errores registrados"
   },
   "startShift": {
     "eyebrow": "Antes de empezar",
@@ -1135,7 +1173,36 @@
     "breakNone": "Sin descansos aún",
     "breakStart": "Iniciar descanso",
     "breakEnd": "Terminar descanso",
-    "breakSummary": "{{count}} descanso(s) · {{min}} min en total"
+    "breakSummary": "{{count}} descanso(s) · {{min}} min en total",
+    "clockInTitle": "Marcar entrada",
+    "onDuty": "En turno",
+    "clockedInSince": "Entrada registrada a las",
+    "passdownTitle": "Pase de turno",
+    "passdownHint": "Al marcar salida reportarás las novedades y consignas para el siguiente supervisor.",
+    "readyToStart": "Listo para iniciar tu turno",
+    "clockInHintFull": "Completa la lista de verificación y toma una selfie con tu ubicación para marcar la entrada.",
+    "stepChecklist": "Checklist",
+    "stepSelfie": "Selfie + GPS",
+    "mobileStation": "Supervisión",
+    "clockOutDone": "Salida registrada",
+    "clockInDone": "Entrada registrada",
+    "clockOutDoneHint": "Tu turno ha finalizado.",
+    "clockInDoneHint": "Tu turno ha comenzado.",
+    "goToDashboard": "Ir al panel",
+    "clockError": "No se pudo registrar. Intenta de nuevo.",
+    "route": {
+      "none": "Sin ruta asignada hoy",
+      "noneHint": "No tienes una ruta de rondas programada para hoy.",
+      "progress": "Progreso",
+      "today": "Ruta de hoy",
+      "stops": "paradas",
+      "stopsTitle": "Paradas",
+      "completed": "Completado",
+      "pending": "Pendiente",
+      "starting": "Iniciando…",
+      "continue": "Continuar",
+      "start": "Iniciar ruta"
+    }
   },
   "notif": {
     "title": "Notificaciones",
@@ -1248,6 +1315,7 @@
     "noPhone": "Sin número disponible"
   },
   "messages": {
+    "title": "Mensajes",
     "subtitle": "Todas las conversaciones",
     "all": "Todas",
     "operations": "Operaciones",

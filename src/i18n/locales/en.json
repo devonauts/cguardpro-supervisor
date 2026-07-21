@@ -20,7 +20,9 @@
     "remove": "Remove",
     "yes": "Yes",
     "no": "No",
-    "back": "Back"
+    "back": "Back",
+    "on": "On",
+    "off": "Off"
   },
   "auth": {
     "signIn": "Sign in",
@@ -60,7 +62,8 @@
     "route": "Route",
     "team": "Team",
     "radio": "Radio",
-    "menu": "Menu"
+    "menu": "Menu",
+    "messages": "Messages"
   },
   "guards": {
     "title": "Guards",
@@ -110,6 +113,9 @@
     "sortBy": "Sort by",
     "byStatus": "Status",
     "empty": "No stations to show"
+  },
+  "attendance": {
+    "title": "Attendance"
   },
   "incidentDetail": {
     "title": "Incident Details",
@@ -606,6 +612,7 @@
   "onduty": {
     "liveAlerts": "Incidents",
     "active": "On duty",
+    "onDuty": "On duty",
     "timeOnDuty": "Time on duty",
     "insideArea": "Inside the post area",
     "stationFeatures": "Post controls",
@@ -837,7 +844,38 @@
     "takeSelfie": "Take a selfie",
     "choosePhoto": "Choose from gallery",
     "removePhoto": "Remove photo",
-    "photoError": "Could not upload the photo. Please try again."
+    "photoError": "Could not upload the photo. Please try again.",
+    "settings": "Settings",
+    "roleSupervisor": "Security Supervisor",
+    "roleGuard": "Security Officer",
+    "noStation": "No post assigned",
+    "employeeId": "Employee ID",
+    "status": "Status",
+    "offDuty": "Off duty",
+    "joined": "Joined",
+    "phone": "Phone",
+    "performance": "Performance summary",
+    "metricPatrols": "Patrols completed",
+    "metricCompliance": "Compliance",
+    "metricPunctuality": "Punctuality",
+    "metricScore": "Rating",
+    "groupAccount": "My account",
+    "personalInfo": "Personal information",
+    "personalInfoSub": "Update your contact details",
+    "scheduleSub": "Your upcoming shifts",
+    "noticesSub": "Memos and announcements",
+    "timeOff": "Time off",
+    "timeOffSub": "Balance and requests",
+    "groupDevice": "Device & app",
+    "permissions": "Device permissions",
+    "permissionsSub": "Location, camera, microphone and notifications",
+    "languageSub": "Spanish / English",
+    "sounds": "Sounds & vibration",
+    "soundsSub": "App tones and haptics",
+    "diagnostics": "Diagnostics",
+    "diagnosticsSub": "Device error log",
+    "logsCount": "records",
+    "noLogs": "No errors logged"
   },
   "startShift": {
     "eyebrow": "Before you start",
@@ -1135,7 +1173,36 @@
     "breakNone": "No breaks yet",
     "breakStart": "Start break",
     "breakEnd": "End break",
-    "breakSummary": "{{count}} break(s) · {{min}} min total"
+    "breakSummary": "{{count}} break(s) · {{min}} min total",
+    "clockInTitle": "Clock in",
+    "onDuty": "On duty",
+    "clockedInSince": "Clocked in at",
+    "passdownTitle": "Shift handover",
+    "passdownHint": "When you clock out you'll report the updates and instructions for the next supervisor.",
+    "readyToStart": "Ready to start your shift",
+    "clockInHintFull": "Complete the checklist and take a selfie with your location to clock in.",
+    "stepChecklist": "Checklist",
+    "stepSelfie": "Selfie + GPS",
+    "mobileStation": "Supervision",
+    "clockOutDone": "Clock-out recorded",
+    "clockInDone": "Clock-in recorded",
+    "clockOutDoneHint": "Your shift has ended.",
+    "clockInDoneHint": "Your shift has started.",
+    "goToDashboard": "Go to dashboard",
+    "clockError": "Could not record. Please try again.",
+    "route": {
+      "none": "No route assigned today",
+      "noneHint": "You have no patrol route scheduled for today.",
+      "progress": "Progress",
+      "today": "Today's route",
+      "stops": "stops",
+      "stopsTitle": "Stops",
+      "completed": "Completed",
+      "pending": "Pending",
+      "starting": "Starting…",
+      "continue": "Continue",
+      "start": "Start route"
+    }
   },
   "notif": {
     "title": "Notifications",
@@ -1248,6 +1315,7 @@
     "noPhone": "No number available"
   },
   "messages": {
+    "title": "Messages",
     "subtitle": "All conversations",
     "all": "All",
     "operations": "Operations",

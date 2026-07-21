@@ -58,6 +58,9 @@ function fmtWhen(iso: any, t: any): string {
 
 function IncidentCard({ inc, onOpen, t }: { inc: any; onOpen: () => void; t: any }) {
   const photoUrl = useFileUrl(inc.photo || null);
+  // A failed/rejected file URL would render as a black tile — fall back to the
+  // placeholder icon on error.
+  const [imgFailed, setImgFailed] = useState(false);
   const sev = (["critical", "high", "medium", "low"].includes(inc.severity) ? inc.severity : "medium") as Severity;
   const status = (["open", "inProgress", "resolved", "closed"].includes(inc.status) ? inc.status : "open") as Status;
   const sevColor = SEV_COLOR[sev];
@@ -65,9 +68,9 @@ function IncidentCard({ inc, onOpen, t }: { inc: any; onOpen: () => void; t: any
   return (
     <button type="button" onClick={() => { fb.tap(); onOpen(); }} className={styles.card}>
       <div className={styles.thumb}>
-        {photoUrl ? (
+        {photoUrl && !imgFailed ? (
           // eslint-disable-next-line jsx-a11y/alt-text
-          <img src={photoUrl} />
+          <img src={photoUrl} onError={() => setImgFailed(true)} />
         ) : (
           <span className={styles.thumbPh}><ImageIcon size={24} /></span>
         )}

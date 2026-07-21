@@ -50,9 +50,13 @@ function since(iso: any, t: any): string {
 /** A photo thumbnail that resolves a token URL for a private file object. */
 function Thumb({ photo, className }: { photo: any; className: string }) {
   const url = useFileUrl(photo || null);
-  return url ? (
+  // A private file whose token/download URL fails (rejected raw ?privateUrl=, or
+  // a genuinely broken/dark capture) would otherwise render as a confusing black
+  // box. On error, hide the img and fall back to the placeholder icon.
+  const [failed, setFailed] = useState(false);
+  return url && !failed ? (
     // eslint-disable-next-line jsx-a11y/alt-text
-    <img src={url} className={className} />
+    <img src={url} className={className} onError={() => setFailed(true)} />
   ) : (
     <span className={`${className} grid place-items-center text-muted`}><ImageIcon size={18} /></span>
   );
