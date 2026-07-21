@@ -48,6 +48,20 @@
       "send": "Send link",
       "sentTitle": "Check your email",
       "continue": "Continue"
+    },
+    "reset": {
+      "tooShort": "The password must be at least 8 characters.",
+      "mismatch": "The passwords don't match.",
+      "error": "The link is invalid or expired. Request a new one.",
+      "title": "Reset password",
+      "subtitle": "Create a new password for your account.",
+      "success": "Your password was updated. You can now sign in.",
+      "goLogin": "Go to sign in",
+      "newPassword": "New password",
+      "confirm": "Confirm password",
+      "saving": "Saving…",
+      "submit": "Save password",
+      "cancel": "Cancel"
     }
   },
   "roles": {
@@ -102,7 +116,8 @@
     "empty": "No guards to show",
     "quickActions": "Actions",
     "filters": "Filters",
-    "more": "More"
+    "more": "More",
+    "refresh": "Refresh"
   },
   "stations": {
     "title": "Stations",
@@ -1059,7 +1074,9 @@
     "subtitle": "Approve who covered a shift",
     "empty": "No backups pending confirmation.",
     "confirm": "Confirm",
-    "reject": "Reject"
+    "reject": "Reject",
+    "rejectConfirmTitle": "Reject backup?",
+    "rejectConfirmBody": "This backup request will be rejected. This can't be undone."
   },
   "uniform": {
     "title": "Uniform inspection",

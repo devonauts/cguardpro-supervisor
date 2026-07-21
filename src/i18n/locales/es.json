@@ -48,6 +48,20 @@
       "send": "Enviar enlace",
       "sentTitle": "Revisa tu correo",
       "continue": "Continuar"
+    },
+    "reset": {
+      "tooShort": "La contraseña debe tener al menos 8 caracteres.",
+      "mismatch": "Las contraseñas no coinciden.",
+      "error": "El enlace es inválido o expiró. Pide uno nuevo.",
+      "title": "Restablecer contraseña",
+      "subtitle": "Crea una nueva contraseña para tu cuenta.",
+      "success": "Tu contraseña se actualizó. Ya puedes iniciar sesión.",
+      "goLogin": "Ir a iniciar sesión",
+      "newPassword": "Nueva contraseña",
+      "confirm": "Confirmar contraseña",
+      "saving": "Guardando…",
+      "submit": "Guardar contraseña",
+      "cancel": "Cancelar"
     }
   },
   "roles": {
@@ -102,7 +116,8 @@
     "empty": "No hay vigilantes que mostrar",
     "quickActions": "Acciones",
     "filters": "Filtros",
-    "more": "Más"
+    "more": "Más",
+    "refresh": "Actualizar"
   },
   "stations": {
     "title": "Estaciones",
@@ -1059,7 +1074,9 @@
     "subtitle": "Aprueba quién cubrió un turno",
     "empty": "No hay respaldos pendientes por confirmar.",
     "confirm": "Confirmar",
-    "reject": "Rechazar"
+    "reject": "Rechazar",
+    "rejectConfirmTitle": "¿Rechazar respaldo?",
+    "rejectConfirmBody": "Se rechazará esta solicitud de respaldo. No se puede deshacer."
   },
   "uniform": {
     "title": "Inspección de uniforme",
