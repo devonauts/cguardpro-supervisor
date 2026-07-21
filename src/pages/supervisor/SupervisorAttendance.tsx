@@ -59,7 +59,7 @@ export default function SupervisorAttendance() {
           <button
             disabled={!!busy}
             onClick={() => act(`exc-${r.id}`, () => supervisorRoute.attendanceResolveException(r.id), t("attendance.resolved", "Resuelto"))}
-            className="shrink-0 rounded-lg bg-online/15 px-3 py-2 text-xs font-bold text-online"
+            className="min-h-[40px] shrink-0 rounded-lg bg-online/15 px-3 py-2 text-xs font-bold text-online"
           >
             {t("attendance.resolve", "Resolver")}
           </button>

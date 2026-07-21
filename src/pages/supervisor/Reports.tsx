@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useHistory } from "react-router-dom";
 import { useIonViewWillEnter, useIonViewWillLeave, useIonToast } from "@ionic/react";
 import {
   AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis,
@@ -106,6 +107,7 @@ function PerfAvatar({ g }: { g: any }) {
 
 export default function Reports() {
   const { t } = useTranslation();
+  const history = useHistory();
   const [present] = useIonToast();
   const [tab, setTab] = useState<Tab>("overview");
   const [chartsVisible, setChartsVisible] = useState(false);
@@ -198,7 +200,7 @@ export default function Reports() {
                     );
                   })}
                 </div>
-                <button type="button" className={styles.viewAll} onClick={() => fb.tap()}>{t("reports.viewAllGuards", "Ver todos los vigilantes")}<ChevronRight size={16} /></button>
+                <button type="button" className={styles.viewAll} onClick={() => { fb.tap(); history.push("/supervisor/guards"); }}>{t("reports.viewAllGuards", "Ver todos los vigilantes")}<ChevronRight size={16} /></button>
               </div>
             )}
 
@@ -233,7 +235,7 @@ export default function Reports() {
                     ))}
                   </div>
                 </div>
-                <button type="button" className={styles.viewAll} onClick={() => fb.tap()}>{t("reports.viewCheckpoints", "Ver puntos de control")}<ChevronRight size={16} /></button>
+                <button type="button" className={styles.viewAll} onClick={() => { fb.tap(); history.push("/supervisor/stations"); }}>{t("reports.viewCheckpoints", "Ver puntos de control")}<ChevronRight size={16} /></button>
               </div>
             )}
 

@@ -126,11 +126,12 @@ export default function IncidentDetail() {
   const notes: any[] = Array.isArray(i.notes) ? i.notes : [];
   const counts = i.counts || { evidence: photos.length, notes: notes.length, tasks: 0 };
 
+  const reporterPhone: string | null = i.reportedBy?.phone || i.assignedTo?.phone || null;
   const right = (
     <div className="flex items-center gap-0.5">
       <button type="button" aria-label={t("guards.chat", "Chat")} onClick={() => setNoteOpen(true)} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><MessageSquare size={20} /></button>
-      <button type="button" aria-label={t("guards.call", "Llamar")} onClick={() => fb.tap()} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><Phone size={20} /></button>
-      <button type="button" aria-label={t("guards.more", "Más")} onClick={() => fb.tap()} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><MoreVertical size={20} /></button>
+      <button type="button" aria-label={t("guards.call", "Llamar")} onClick={() => { fb.tap(); reporterPhone ? window.open(`tel:${reporterPhone}`, "_system") : present({ message: t("guardDetail.soon", "Próximamente"), duration: 1300, position: "top" }); }} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><Phone size={20} /></button>
+      <button type="button" aria-label={t("guards.more", "Más")} onClick={() => { fb.tap(); present({ message: t("guardDetail.soon", "Próximamente"), duration: 1300, position: "top" }); }} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><MoreVertical size={20} /></button>
     </div>
   );
 
@@ -174,7 +175,9 @@ export default function IncidentDetail() {
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-2">
-              <span className={styles.badge} style={{ color: sevColor, background: `${sevColor}22` }}>{String(t(`incidents.severity.${i.severity}`, i.severity))}</span>
+              {i.severity ? (
+                <span className={styles.badge} style={{ color: sevColor, background: `${sevColor}22` }}>{String(t(`incidents.severity.${i.severity}`, i.severity))}</span>
+              ) : null}
               <span className={styles.badge} style={{ color: stColor, background: `${stColor}22` }}>{String(t(`incidents.statusLabel.${i.status}`, i.status))}</span>
             </div>
             <p className={styles.title}>{i.title}</p>

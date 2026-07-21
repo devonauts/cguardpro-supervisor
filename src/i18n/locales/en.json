@@ -38,7 +38,17 @@
     "errorGeneric": "Could not sign in. Check your credentials.",
     "errorNotAllowed": "This app is only for security guards and supervisors.",
     "errorNoRole": "Your account has no guard or supervisor role assigned.",
-    "rateLimited": "Too many attempts. Try again in a few seconds."
+    "rateLimited": "Too many attempts. Try again in a few seconds.",
+    "forgot": {
+      "link": "Forgot your password?",
+      "invalidEmail": "Enter a valid email address.",
+      "back": "Sign in",
+      "title": "Reset password",
+      "sending": "Sending…",
+      "send": "Send link",
+      "sentTitle": "Check your email",
+      "continue": "Continue"
+    }
   },
   "roles": {
     "securityGuard": "Security Guard",
@@ -115,7 +125,19 @@
     "empty": "No stations to show"
   },
   "attendance": {
-    "title": "Attendance"
+    "title": "Attendance",
+    "actionError": "Couldn't complete the action",
+    "resolved": "Resolved",
+    "resolve": "Resolve",
+    "approved": "Approved",
+    "approve": "Approve",
+    "rejected": "Rejected",
+    "reject": "Reject",
+    "pendingCount": "{{count}} pending",
+    "allClear": "No attendance pending",
+    "clockInRequests": "Clock-in requests",
+    "clockOutRequests": "Clock-out requests",
+    "exceptions": "Exceptions"
   },
   "incidentDetail": {
     "title": "Incident Details",
@@ -438,7 +460,8 @@
       "critical": "Critical",
       "high": "High",
       "medium": "Medium",
-      "low": "Low"
+      "low": "Low",
+      "label": "Severity"
     },
     "types": {
       "unauthorizedAccess": "Unauthorized access",
@@ -1123,7 +1146,11 @@
   "map": {
     "openInMaps": "View on map",
     "lastSeen": "seen {{ago}}",
-    "locate": "Map"
+    "locate": "Map",
+    "zones": "Zones",
+    "team": "Teammates on duty",
+    "you": "You",
+    "noTeam": "No other guards on duty at this site."
   },
   "tasks": {
     "complete": "Complete",
@@ -1398,5 +1425,43 @@
     "stopsChecked": "Stops registered",
     "completion": "Completed",
     "backHome": "Back to home"
+  },
+  "net": {
+    "charge": "connect a charger.",
+    "lowBattery": "Low battery",
+    "offline": "Offline — some actions won't be available until the connection is restored.",
+    "pendingMany": "actions pending to send",
+    "pendingOne": "action pending to send",
+    "queuedReport": "Offline — the report will be sent when you reconnect.",
+    "syncing": "Sending pending actions…"
+  },
+  "notifications": {
+    "clear": "Clear",
+    "clearConfirmTitle": "Clear notifications?",
+    "empty": "You have no notifications",
+    "error": "Couldn't load notifications",
+    "markAllRead": "Mark all as read",
+    "retry": "Retry",
+    "title": "Notifications"
+  },
+  "passdown": {
+    "acknowledge": "Got it",
+    "addInstruction": "Add instruction",
+    "from": "From",
+    "high": "High",
+    "hint": "Leave the news and instructions for the incoming guard. The next shift receives them automatically.",
+    "instructionPlaceholder": "e.g. Check the water pump at 3am",
+    "instructionsHint": "Each instruction becomes a task for the next shift.",
+    "instructionsLabel": "Instructions for the incoming guard",
+    "instructionsLabelSup": "Instructions for the incoming supervisor",
+    "low": "Low",
+    "medium": "Medium",
+    "noNews": "All clear",
+    "noNewsSubmit": "All clear and clock out",
+    "receivedTitle": "Shift handover received",
+    "required": "The shift news is required.",
+    "submit": "Hand over shift and clock out",
+    "summaryLabel": "Shift news",
+    "title": "Shift handover"
   }
 }

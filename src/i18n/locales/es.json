@@ -38,7 +38,17 @@
     "errorGeneric": "No se pudo iniciar sesión. Revisa tus credenciales.",
     "errorNotAllowed": "Esta app es solo para vigilantes de seguridad y supervisores.",
     "errorNoRole": "Tu cuenta no tiene un rol de vigilante o supervisor asignado.",
-    "rateLimited": "Demasiados intentos. Intenta de nuevo en unos segundos."
+    "rateLimited": "Demasiados intentos. Intenta de nuevo en unos segundos.",
+    "forgot": {
+      "link": "¿Olvidaste tu contraseña?",
+      "invalidEmail": "Escribe un correo electrónico válido.",
+      "back": "Iniciar sesión",
+      "title": "Restablecer contraseña",
+      "sending": "Enviando…",
+      "send": "Enviar enlace",
+      "sentTitle": "Revisa tu correo",
+      "continue": "Continuar"
+    }
   },
   "roles": {
     "securityGuard": "Vigilante de Seguridad",
@@ -115,7 +125,19 @@
     "empty": "No hay estaciones que mostrar"
   },
   "attendance": {
-    "title": "Asistencia"
+    "title": "Asistencia",
+    "actionError": "No se pudo completar la acción",
+    "resolved": "Resuelto",
+    "resolve": "Resolver",
+    "approved": "Aprobado",
+    "approve": "Aprobar",
+    "rejected": "Rechazado",
+    "reject": "Rechazar",
+    "pendingCount": "{{count}} pendiente(s)",
+    "allClear": "Sin pendientes de asistencia",
+    "clockInRequests": "Solicitudes de entrada",
+    "clockOutRequests": "Solicitudes de salida",
+    "exceptions": "Excepciones"
   },
   "incidentDetail": {
     "title": "Detalle del incidente",
@@ -438,7 +460,8 @@
       "critical": "Crítico",
       "high": "Alto",
       "medium": "Medio",
-      "low": "Bajo"
+      "low": "Bajo",
+      "label": "Severidad"
     },
     "types": {
       "unauthorizedAccess": "Acceso no autorizado",
@@ -1123,7 +1146,11 @@
   "map": {
     "openInMaps": "Ver en mapa",
     "lastSeen": "visto {{ago}}",
-    "locate": "Mapa"
+    "locate": "Mapa",
+    "zones": "Zonas",
+    "team": "Compañeros en servicio",
+    "you": "Tú",
+    "noTeam": "No hay otros vigilantes en servicio en este sitio."
   },
   "tasks": {
     "complete": "Completar",
@@ -1398,5 +1425,43 @@
     "stopsChecked": "Paradas registradas",
     "completion": "Completado",
     "backHome": "Volver al inicio"
+  },
+  "net": {
+    "charge": "conecta un cargador.",
+    "lowBattery": "Batería baja",
+    "offline": "Sin conexión — algunas acciones no estarán disponibles hasta que se restablezca.",
+    "pendingMany": "acciones pendientes por enviar",
+    "pendingOne": "acción pendiente por enviar",
+    "queuedReport": "Sin conexión — el reporte se enviará al reconectar.",
+    "syncing": "Enviando acciones pendientes…"
+  },
+  "notifications": {
+    "clear": "Limpiar",
+    "clearConfirmTitle": "¿Limpiar notificaciones?",
+    "empty": "No tienes notificaciones",
+    "error": "No se pudieron cargar las notificaciones",
+    "markAllRead": "Marcar todo como leído",
+    "retry": "Reintentar",
+    "title": "Notificaciones"
+  },
+  "passdown": {
+    "acknowledge": "Entendido",
+    "addInstruction": "Agregar instrucción",
+    "from": "De",
+    "high": "Alta",
+    "hint": "Deja las novedades e instrucciones para el guardia que entra. El siguiente turno las recibe automáticamente.",
+    "instructionPlaceholder": "Ej. Revisar bomba de agua a las 3am",
+    "instructionsHint": "Cada instrucción se convierte en una tarea para el próximo turno.",
+    "instructionsLabel": "Instrucciones para el guardia entrante",
+    "instructionsLabelSup": "Instrucciones para el supervisor entrante",
+    "low": "Baja",
+    "medium": "Media",
+    "noNews": "Sin novedad",
+    "noNewsSubmit": "Sin novedad y marcar salida",
+    "receivedTitle": "Pase de turno recibido",
+    "required": "Las novedades son obligatorias.",
+    "submit": "Entregar turno y marcar salida",
+    "summaryLabel": "Novedades del turno",
+    "title": "Pase de turno"
   }
 }

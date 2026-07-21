@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
+import { useIonToast } from "@ionic/react";
 import {
   Search, SlidersHorizontal, Plus, Users, CalendarDays, Clock, UserRound,
   Building2, IdCard, Car, ChevronRight, UserCircle2,
@@ -91,7 +92,9 @@ function VisitorCard({ v, t, onOpen }: { v: any; t: any; onOpen: () => void }) {
 export default function SupervisorVisitors() {
   const { t } = useTranslation();
   const history = useHistory();
+  const [present] = useIonToast();
   const [filter, setFilter] = useState<Filter>("all");
+  const soon = () => present({ message: t("guardDetail.soon", "Próximamente"), duration: 1300, position: "top" });
 
   const { data, loading, error, reload } = useAsync(() => supervisorRoute.visitors(), []);
   const visitors: any[] = Array.isArray(data?.visitors) ? data.visitors : [];
@@ -112,8 +115,8 @@ export default function SupervisorVisitors() {
 
   const right = (
     <div className="flex items-center gap-0.5">
-      <button type="button" aria-label={t("common.search", "Buscar")} onClick={() => fb.tap()} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><Search size={20} /></button>
-      <button type="button" aria-label={t("guards.filters", "Filtros")} onClick={() => fb.tap()} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><SlidersHorizontal size={20} /></button>
+      <button type="button" aria-label={t("common.search", "Buscar")} onClick={() => { fb.tap(); soon(); }} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><Search size={20} /></button>
+      <button type="button" aria-label={t("guards.filters", "Filtros")} onClick={() => { fb.tap(); soon(); }} className="pressable grid h-11 w-11 place-items-center rounded-full text-ink active:bg-surface-2"><SlidersHorizontal size={20} /></button>
       <button type="button" aria-label={t("visitors.add", "Registrar")} onClick={() => { fb.press(); reload(); }} className="pressable ml-0.5 grid h-11 w-11 place-items-center rounded-full bg-gold text-on-accent"><Plus size={20} /></button>
     </div>
   );

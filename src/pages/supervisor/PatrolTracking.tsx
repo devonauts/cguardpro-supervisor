@@ -231,7 +231,9 @@ export default function PatrolTracking() {
               </SectionTitle>
               <div className="space-y-2">
                 {recentScans.slice(0, 8).map((s: any, i: number) => {
-                  const sd: any = s.scannedData || {};
+                  // The guard's checkpoint name lives at scannedData.extra.checkpointName;
+                  // the top-level .checkpointName was a dead read (masked by tag.name).
+                  const sd: any = { ...(s.scannedData?.extra || {}), ...(s.scannedData || {}) };
                   const cpName =
                     sd.checkpointName || s.tag?.name || t("patrol.title");
                   const guard = guardOf(s);

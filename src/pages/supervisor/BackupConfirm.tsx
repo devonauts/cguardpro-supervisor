@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useIonAlert } from "@ionic/react";
 import { LifeBuoy, Loader2, Check, X, MapPin } from "lucide-react";
 import { Screen } from "@/components/Screen";
 import { Card, SkeletonList, EmptyState, ErrorState, Avatar } from "@/components/ui";
@@ -22,6 +23,21 @@ export default function BackupConfirm() {
   );
   const rows = (data as any[]) || [];
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [presentAlert] = useIonAlert();
+
+  // Rejecting a colleague's backup offer is consequential and not undoable —
+  // confirm first (a one-tap mis-tap used to silently decline it).
+  const rejectWithConfirm = (id: string) => {
+    if (busyId) return;
+    presentAlert({
+      header: t("backupConfirm.rejectConfirmTitle", "¿Rechazar respaldo?"),
+      message: t("backupConfirm.rejectConfirmBody", "Se rechazará esta solicitud de respaldo. No se puede deshacer."),
+      buttons: [
+        { text: t("app.cancel", "Cancelar"), role: "cancel" },
+        { text: t("backupConfirm.reject", "Rechazar"), role: "destructive", handler: () => act(id, false) },
+      ],
+    });
+  };
 
   const act = async (id: string, confirm: boolean) => {
     if (busyId) return;
@@ -93,7 +109,7 @@ export default function BackupConfirm() {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => act(ev.id, false)}
+                  onClick={() => rejectWithConfirm(ev.id)}
                   disabled={busyId === ev.id}
                   className="flex items-center justify-center gap-2 px-5"
                 >

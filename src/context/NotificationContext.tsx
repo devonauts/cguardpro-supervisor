@@ -44,6 +44,12 @@ interface NotificationContextType {
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
+// Cap the in-memory list. Realtime events prepend all shift long (deduped by id
+// but never pruned), so over an 8-12h shift the array — and the day-grouped
+// render tree in the center — would grow without bound. The REST list only ever
+// loads 30; keep a little headroom for live events that arrive between refreshes.
+const MAX_ITEMS = 60;
+
 export const useNotifications = (): NotificationContextType => {
   const ctx = useContext(NotificationContext);
   if (!ctx) throw new Error("useNotifications must be used within <NotificationProvider>");
@@ -130,7 +136,7 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
       setLastEvent(n); // notify data screens so they can live-refresh
       setItems((prev) => {
         if (prev.some((x) => x.id === n.id)) return prev;
-        return [n, ...prev];
+        return [n, ...prev].slice(0, MAX_ITEMS);
       });
     });
     return disconnect;

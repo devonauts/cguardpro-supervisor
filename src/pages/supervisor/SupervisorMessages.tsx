@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
-import { IonModal, IonContent, useIonActionSheet } from "@ionic/react";
+import { IonModal, IonContent, useIonActionSheet, useIonToast } from "@ionic/react";
 import {
   Search, Users, MessageSquare, Megaphone, ShieldAlert,
   Building2, ChevronRight, Archive, BellOff, UserRound, Plus, X, Loader2, SendHorizontal,
@@ -117,6 +117,7 @@ export default function SupervisorMessages() {
 
   const [composing, setComposing] = useState(false);
   const [presentActionSheet] = useIonActionSheet();
+  const [presentToast] = useIonToast();
   const { data, loading, error, reload } = useAsync<any>(() => staffMessageService.listThreads({ limit: 100 }), []);
 
   const confirmDelete = (c: any) => {
@@ -196,7 +197,7 @@ export default function SupervisorMessages() {
             shown.map((c) => <ConvRow key={c.id} c={c} onOpen={() => { fb.tap(); history.push(`/supervisor/messages/${c.id}`); }} onLongPress={() => confirmDelete(c)} />)
           )}
 
-          <button type="button" onClick={() => fb.tap()} className={styles.archived}>
+          <button type="button" onClick={() => { fb.tap(); presentToast({ message: t("guardDetail.soon", "Próximamente"), duration: 1300, position: "top" }); }} className={styles.archived}>
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-surface-2 text-muted"><Archive size={18} /></span>
             <span className="flex-1 text-[15px] font-semibold text-ink">{t("messages.archived", "Archivadas")}</span>
             <ChevronRight size={18} className="text-faint" />

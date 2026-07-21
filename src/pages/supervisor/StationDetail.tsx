@@ -271,7 +271,7 @@ export default function StationDetail() {
               <ShieldCheck size={18} className={`shrink-0 ${riskMeta[s.riskLevel] || "text-muted"}`} />
               <div className="min-w-0">
                 <p className={styles.infoLabel}>{t("stationDetail.riskLevel", "Nivel de riesgo")}</p>
-                <p className={`truncate text-[14px] font-bold ${riskMeta[s.riskLevel] || "text-ink"}`}>{String(t(`stationDetail.risk_${s.riskLevel}`, s.riskLevel))}</p>
+                <p className={`truncate text-[14px] font-bold ${riskMeta[s.riskLevel] || "text-ink"}`}>{s.riskLevel ? String(t(`stationDetail.risk_${s.riskLevel}`, s.riskLevel)) : "—"}</p>
               </div>
             </div>
             <div className="w-px shrink-0 bg-line" />

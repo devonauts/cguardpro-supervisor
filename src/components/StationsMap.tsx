@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -78,6 +79,7 @@ export function StationsMap({ stations, filter = null, onSelect, onOpenDetail, o
   cbRef.current = { onSelect, onOpenDetail, onNavigate };
   const meRef = useRef<{ marker: L.Marker; halo: L.Circle } | null>(null);
   const meCoordsRef = useRef<[number, number] | null>(null);
+  const fitBoundsRef = useRef<L.LatLngBounds | null>(null);
   const tileRef = useRef<L.TileLayer | null>(null);
   const { theme } = useTheme();
   const [dark, setDark] = useState(theme !== "light");
@@ -120,7 +122,16 @@ export function StationsMap({ stations, filter = null, onSelect, onOpenDetail, o
     let ro: ResizeObserver | undefined;
     try {
       ro = new ResizeObserver(() => {
-        if (mapRef.current) mapRef.current.invalidateSize();
+        const m = mapRef.current;
+        if (!m) return;
+        m.invalidateSize();
+        // On a full reload the markers effect's fitBounds can run BEFORE the
+        // container has a real size — Leaflet then fits against a 0px viewport
+        // and zooms all the way out to the whole world (zoom 0). Once the
+        // container gets a real size, re-apply the last fit.
+        if (m.getSize().x > 0 && fitBoundsRef.current && fitBoundsRef.current.isValid()) {
+          m.fitBounds(fitBoundsRef.current.pad(0.25), { animate: false, maxZoom: 16 });
+        }
       });
       ro.observe(elRef.current);
     } catch { /* ResizeObserver unavailable — the 200ms one-shot still runs */ }
@@ -208,7 +219,13 @@ export function StationsMap({ stations, filter = null, onSelect, onOpenDetail, o
     if (meCoordsRef.current) bounds.extend(meCoordsRef.current);
 
     if (bounds.isValid()) {
-      map.fitBounds(bounds.pad(0.25), { animate: false, maxZoom: 16 });
+      // Remember the target so the ResizeObserver can re-fit once the container
+      // is actually sized (avoids the reload → world-zoom-0 bug).
+      fitBoundsRef.current = bounds;
+      // Only fit now if the map already has a real size; otherwise the RO re-fits.
+      if (map.getSize().x > 0) {
+        map.fitBounds(bounds.pad(0.25), { animate: false, maxZoom: 16 });
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(visible.map((s) => [s.id, s.status, s.lat, s.lng]))]);
@@ -231,7 +248,7 @@ export function StationsMap({ stations, filter = null, onSelect, onOpenDetail, o
         fillOpacity: 0.12,
       }).addTo(map);
       const marker = L.marker([lat, lng], {
-        icon: pinIcon("you", "Tú"),
+        icon: pinIcon("you", i18n.t("map.you", "Tú")),
         keyboard: false,
         zIndexOffset: 1000,
       }).addTo(map);

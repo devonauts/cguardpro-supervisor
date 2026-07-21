@@ -15,6 +15,7 @@ import { normalizeStatus } from "@/lib/normalize";
 
 // Tab roots
 import DashboardMap from "./DashboardMap";
+import BackupConfirm from "./BackupConfirm";
 import StationsList from "./StationsList";
 import StationDetail from "./StationDetail";
 import CreateTask from "./CreateTask";
@@ -134,6 +135,9 @@ export default function SupervisorApp() {
         <Route exact path="/supervisor/incidents/:incidentId" component={IncidentDetail} />
         <Route exact path="/supervisor/profile" component={Profile} />
         <Route exact path="/supervisor/permissions" component={GuardPermissions} />
+        {/* Backup offers — the More/SideMenu "Respaldo" links pointed here but the
+            route was never registered, so tapping it bounced to the dashboard. */}
+        <Route exact path="/supervisor/backup" component={BackupConfirm} />
 
         {/* Vehicle-patrol route flow (not tabbed) */}
         <Route exact path="/supervisor/route" component={RouteToday} />

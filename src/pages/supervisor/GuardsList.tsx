@@ -2,6 +2,7 @@ import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { Screen } from "@/components/Screen";
+import { ErrorState, SkeletonList } from "@/components/ui";
 import {
   MapPin,
   Clock,
@@ -17,7 +18,7 @@ import {
   SignalHigh,
   SignalMedium,
   SignalLow,
-  Plus,
+  RotateCw,
   Users,
 } from "lucide-react";
 import brandLogo from "@/assets/brand-logo.png";
@@ -432,7 +433,7 @@ export default function GuardsList() {
     return () => clearInterval(id);
   }, []);
 
-  const { data, reload } = useAsync(async () => {
+  const { data, error, loading, reload } = useAsync(async () => {
     try {
       const res: any = await supervisorRoute.guards();
       const guards = normalize(res?.guards);
@@ -446,12 +447,18 @@ export default function GuardsList() {
             }
           : summarize(guards);
       return { guards, summary };
-    } catch {
-      // Pre-deploy fallback: roster + active set, telemetry unknown.
+    } catch (primaryErr) {
+      // Pre-deploy fallback: roster + active set, telemetry unknown. If BOTH
+      // also fail (truly offline), RETHROW so the screen shows an error+retry
+      // — never a misleading "no hay vigilantes" empty state, which in a
+      // security-ops context reads as "no guards on duty".
+      let rosterFailed = false;
+      let activeFailed = false;
       const [roster, active] = await Promise.all([
-        guardsService.list({ limit: 500 }).catch(() => ({ rows: [] })),
-        guardsService.activeLocations().catch(() => []),
+        guardsService.list({ limit: 500 }).catch(() => { rosterFailed = true; return { rows: [] }; }),
+        guardsService.activeLocations().catch(() => { activeFailed = true; return []; }),
       ]);
+      if (rosterFailed && activeFailed) throw primaryErr;
       const activeIds = new Set(
         (Array.isArray(active) ? active : []).map((a: any) => String(a.guardId ?? a.id)),
       );
@@ -504,7 +511,13 @@ export default function GuardsList() {
 
         {/* Cards */}
         <div className="stagger space-y-4 px-4 pb-28 pt-4">
-          {shown.length === 0 ? (
+          {error && guards.length === 0 ? (
+            // Offline / total failure — an explicit error+retry, NOT the empty
+            // state (which would falsely say "no guards on duty").
+            <div className="mt-14"><ErrorState onRetry={reload} /></div>
+          ) : loading && guards.length === 0 ? (
+            <SkeletonList />
+          ) : shown.length === 0 ? (
             <div className="mt-16 flex flex-col items-center gap-2 text-center">
               <Users size={30} className="text-faint" />
               <p className="text-sm text-muted">{t("guards.empty", "No hay vigilantes que mostrar")}</p>
@@ -521,10 +534,11 @@ export default function GuardsList() {
           )}
         </div>
 
-        {/* FAB */}
+        {/* FAB — refreshes the roster. Labeled/iconed as a refresh action so it
+            matches its behavior (a "+" here misleadingly implied "add guard"). */}
         <button
           type="button"
-          aria-label={t("guards.quickActions", "Acciones")}
+          aria-label={t("guards.refresh", "Actualizar")}
           onClick={() => {
             fb.press();
             reload();
@@ -532,7 +546,7 @@ export default function GuardsList() {
           className="pressable fixed bottom-24 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-gold text-on-accent shadow-lg shadow-black/30"
           style={{ marginBottom: "env(safe-area-inset-bottom)" }}
         >
-          <Plus size={26} />
+          <RotateCw size={24} />
         </button>
     </Screen>
   );
