@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { useEffect, useRef, useState, useCallback, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams, useLocation } from "react-router-dom";
@@ -33,7 +34,7 @@ function AttachmentAudio({ src }: { src?: string | null }) {
 
 const fmt = (d?: string | null) => {
   if (!d) return "";
-  try { return new Date(d).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }); } catch { return ""; }
+  try { return new Date(d).toLocaleTimeString(i18n.language?.startsWith("en") ? "en-US" : "es-ES", { hour: "2-digit", minute: "2-digit" }); } catch { return ""; }
 };
 const dayLabel = (d?: string | null, t?: any) => {
   if (!d) return "";
@@ -43,7 +44,7 @@ const dayLabel = (d?: string | null, t?: any) => {
   const same = (a: Date, b: Date) => a.toDateString() === b.toDateString();
   if (same(dt, today)) return t ? t("incidents.today", "Hoy") : "Hoy";
   if (same(dt, y)) return t ? t("incidents.yesterday", "Ayer") : "Ayer";
-  return dt.toLocaleDateString([], { day: "numeric", month: "long" });
+  return dt.toLocaleDateString(i18n.language?.startsWith("en") ? "en-US" : "es-ES", { day: "numeric", month: "long" });
 };
 const newId = () =>
   (globalThis.crypto && (globalThis.crypto as any).randomUUID

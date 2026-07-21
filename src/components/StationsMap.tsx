@@ -103,7 +103,11 @@ export function StationsMap({ stations, filter = null, onSelect, onOpenDetail, o
     tileRef.current = L.tileLayer(dark ? BASEMAP.dark : BASEMAP.light, {
       subdomains: BASEMAP.subdomains,
       maxZoom: BASEMAP.maxZoom,
-      detectRetina: true,
+      // detectRetina quadruples tile memory on retina phones (2× tiles at 2× res).
+      // This full-screen dashboard map stays mounted; with other Leaflet maps alive
+      // it pushed the WKWebView over its memory cap and iOS killed the app. Keep it
+      // off — matches PatrolMap, the other map that shares this WebView budget.
+      detectRetina: false,
       crossOrigin: true,
     }).addTo(map);
 
@@ -135,7 +139,7 @@ export function StationsMap({ stations, filter = null, onSelect, onOpenDetail, o
     tileRef.current = L.tileLayer(dark ? BASEMAP.dark : BASEMAP.light, {
       subdomains: BASEMAP.subdomains,
       maxZoom: BASEMAP.maxZoom,
-      detectRetina: true,
+      detectRetina: false,
       crossOrigin: true,
     }).addTo(map);
     tileRef.current.bringToBack();

@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 // Shared helpers for the multi-step route mission flow. Normalizes the
 // /supervisor/me/routes payloads (which vary in shape) and computes sequential
 // arrival ETAs for the timeline.
@@ -92,7 +93,7 @@ export function computeEtas(stops: Stop[], from: Date = new Date()): Date[] {
 }
 
 export function fmtTime(d: Date): string {
-  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  return d.toLocaleTimeString(i18n.language?.startsWith("en") ? "en-US" : "es-ES", { hour: "numeric", minute: "2-digit" });
 }
 export function minutesUntil(d: Date): number {
   return Math.max(1, Math.round((d.getTime() - Date.now()) / 60000));

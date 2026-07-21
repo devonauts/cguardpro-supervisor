@@ -5,6 +5,7 @@ import { CheckCircle2, Loader2, Radio as RadioIcon, Mic, Square, X } from "lucid
 import { radioCheckService } from "@/lib/services";
 import { startRecording, stopRecording, cancelRecording, isRecordingSupported } from "@/lib/audioRecorder";
 import { onPush } from "@/lib/pushEvents";
+import { pushBackHandler } from "@/lib/backButton";
 import { useRadio } from "@/context/RadioContext";
 import fb from "@/lib/feedback";
 
@@ -66,15 +67,22 @@ export default function RadioCheckAlert() {
   }, []);
 
   // Poll fallback + instant push wake. Tight cadence (8s) — the response window is
-  // only ~60s, so a missed push must still surface fast.
+  // only ~60s, so a missed push must still surface fast. PAUSE while the app is
+  // backgrounded (no check can be answered then) to save radio/battery over a
+  // 12h shift, and refresh immediately on return to foreground.
   useEffect(() => {
-    refresh();
-    const id = setInterval(refresh, 8000);
+    let id: ReturnType<typeof setInterval> | null = null;
+    const start = () => { if (!id) { refresh(); id = setInterval(refresh, 8000); } };
+    const stop = () => { if (id) { clearInterval(id); id = null; } };
+    const onVis = () => (document.hidden ? stop() : start());
+    start();
+    document.addEventListener("visibilitychange", onVis);
     const off = onPush((d: any) => {
       if (d?.type === "radio.check_request" || d?.type === "radio.session_started") refresh();
     });
     return () => {
-      clearInterval(id);
+      stop();
+      document.removeEventListener("visibilitychange", onVis);
       off();
     };
   }, [refresh]);
@@ -177,13 +185,20 @@ export default function RadioCheckAlert() {
     setMode("idle");
   }, []);
 
+  // Hardware back on the full-screen takeover must NOT navigate the page
+  // underneath — consume it (do nothing; the guard answers via the buttons).
+  useEffect(() => {
+    if (!entry || onRadioScreen) return;
+    return pushBackHandler(() => true);
+  }, [entry, onRadioScreen]);
+
   if (!entry || onRadioScreen) return null;
 
   return (
     <div
       role="dialog"
       aria-modal="true"
-      className="safe-top safe-bottom fixed inset-0 z-[9999] flex flex-col bg-surface text-ink"
+      className="safe-top safe-bottom fixed inset-0 z-[30000] flex flex-col bg-surface text-ink"
       style={{ animation: "rcaFade .18s ease-out" }}
     >
       <style>{`@keyframes rcaFade{from{opacity:0}to{opacity:1}}@keyframes rcaPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}`}</style>

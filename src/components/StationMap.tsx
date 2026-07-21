@@ -72,7 +72,13 @@ export function StationMap({
       scrollWheelZoom: false,
     }).setView(center, 17);
     mapRef.current = map;
-    tileRef.current = L.tileLayer(BASEMAP.satellite, { maxZoom: BASEMAP.maxZoom }).addTo(map);
+    // Honor the current layer choice: if the effect re-runs after the user toggled
+    // to street view (data change recreates the map), don't silently snap back to
+    // satellite while the toggle still reads "street".
+    tileRef.current = L.tileLayer(sat ? BASEMAP.satellite : BASEMAP.dark, {
+      subdomains: BASEMAP.subdomains,
+      maxZoom: BASEMAP.maxZoom,
+    }).addTo(map);
 
     const layers: L.Layer[] = [];
     const bounds = L.latLngBounds([]);

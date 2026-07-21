@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
@@ -44,13 +45,13 @@ function fmtWhen(iso: any, t: any): string {
   if (!iso) return "—";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
-  const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const time = d.toLocaleTimeString(i18n.language?.startsWith("en") ? "en-US" : "es-ES", { hour: "numeric", minute: "2-digit" });
   const today = new Date();
   const y = new Date(); y.setDate(today.getDate() - 1);
   const same = (a: Date, b: Date) => a.toDateString() === b.toDateString();
   if (same(d, today)) return `${t("incidents.today", "Hoy")}, ${time}`;
   if (same(d, y)) return `${t("incidents.yesterday", "Ayer")}, ${time}`;
-  return `${d.toLocaleDateString([], { day: "numeric", month: "short" })}, ${time}`;
+  return `${d.toLocaleDateString(i18n.language?.startsWith("en") ? "en-US" : "es-ES", { day: "numeric", month: "short" })}, ${time}`;
 }
 
 /* --------------------------------------------------------------- card */

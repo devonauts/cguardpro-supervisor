@@ -50,25 +50,13 @@ import { useAsync } from "@/lib/useAsync";
 import { guardService } from "@/lib/services";
 import { supervisorRoute, isSupervisorClockedIn } from "@/lib/supervisorRoute";
 import { useFileUrl } from "@/lib/fileUrl";
+import { fmtDate } from "@/lib/format";
 import { loadGuardPerformance, Performance } from "@/lib/performance";
 import { SUPERVISOR_ROLE } from "@/lib/roles";
 import { getErrorLog, clearErrorLog, type LogEntry } from "@/lib/errorLog";
 import fb, { soundsEnabled, setSoundsEnabled, setHapticsEnabled } from "@/lib/feedback";
 
 const APP_VERSION = "2.0.0";
-
-function fmtDate(d: any): string {
-  if (!d) return "—";
-  try {
-    return new Date(d).toLocaleDateString(undefined, {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  } catch {
-    return "—";
-  }
-}
 
 export default function Profile() {
   const { t, i18n } = useTranslation();

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { Screen } from "@/components/Screen";
@@ -220,7 +220,7 @@ function ActionBtn({
 
 /* --------------------------------------------------------------- card */
 
-function GuardCard({
+const GuardCard = memo(function GuardCard({
   g,
   nowMs,
   onOpen,
@@ -348,7 +348,7 @@ function GuardCard({
       </div>
     </div>
   );
-}
+});
 
 /* ---------------------------------------------------- segmented filter */
 
@@ -424,9 +424,11 @@ export default function GuardsList() {
   const [filter, setFilter] = useState<Filter>("all");
   const [nowMs, setNowMs] = useState(() => Date.now());
 
-  // One shared 1s tick drives every card's shift timer + "x min ago".
+  // Coarse 30s tick: on a 500-row roster, per-second re-renders of every card
+  // were the top CPU/jank cost (HH:MM:SS seconds granularity isn.t needed in a
+  // glanceable list — GuardDetail keeps its own 1s timer). Cards are memoized.
   useEffect(() => {
-    const id = setInterval(() => setNowMs(Date.now()), 1000);
+    const id = setInterval(() => setNowMs(Date.now()), 30000);
     return () => clearInterval(id);
   }, []);
 
@@ -487,7 +489,7 @@ export default function GuardsList() {
       onRefresh={reload}
     >
         {/* Segmented filter (native multiswitch) */}
-        <div className="sticky top-14 z-20 bg-background/95 px-4 pb-2 pt-1 backdrop-blur">
+        <div className="sticky top-14 z-20 bg-background px-4 pb-2 pt-1">
           <SegmentedFilter
             value={filter}
             onChange={setFilter}

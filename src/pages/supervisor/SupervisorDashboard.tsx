@@ -28,10 +28,13 @@ import {
 import { normalizeStatus, pick } from "@/lib/normalize";
 import { fb } from "@/lib/feedback";
 
-const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAYS_EN = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const WEEKDAYS_ES = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
 export default function SupervisorDashboard() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  // Chart axis labels must follow the app language, not stay hardcoded English.
+  const WEEKDAYS = i18n.language?.startsWith("en") ? WEEKDAYS_EN : WEEKDAYS_ES;
   const { data, loading, reload } = useAsync(async () => {
     const [kpis, incidents, guards] = await Promise.all([
       operationsService.kpis().catch(() => []),
@@ -63,7 +66,7 @@ export default function SupervisorDashboard() {
       }
     });
     return WEEKDAYS.map((d, idx) => ({ day: d, count: counts[idx] }));
-  }, [incidents]);
+  }, [incidents, WEEKDAYS]);
 
   return (
     <Screen

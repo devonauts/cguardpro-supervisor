@@ -11,6 +11,7 @@ import AnimatedSplash from "./components/AnimatedSplash";
 import { StatusBanner } from "./components/StatusBanner";
 import { startDeviceStatus, stopDeviceStatus } from "./lib/deviceStatus";
 import { startLocationReporter } from "./lib/locationReporter";
+import { runBackChain } from "./lib/backButton";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
 import SupervisorApp from "./pages/supervisor/SupervisorApp";
@@ -71,19 +72,42 @@ export default function App() {
   // duty — self-manages start/stop on duty changes; runs once for the app.
   useEffect(() => { startLocationReporter(); }, []);
 
-  // Android hardware back button: navigate back through the router history when a
-  // stack exists, otherwise minimize instead of dumping the user out of the app.
+  // Android hardware back. Capacitor fires BOTH the App-plugin listener AND a
+  // document 'backbutton' event that Ionic core turns into 'ionBackButton' and
+  // routes (IonRouterOutlet pops a view at priority 0). A previous version
+  // ALSO navigated from the plugin listener, so every press navigated twice
+  // (back from a detail screen skipped the list and landed on the prior tab),
+  // and open sheets/pickers closed AND navigated the page underneath.
+  // Correct wiring: keep an EMPTY plugin listener — its existence is what
+  // stops Capacitor's raw webview.goBack() default — and do all custom
+  // handling via 'ionBackButton' at priority 90 (below Ionic overlays at 100,
+  // above the router at 0): app handlers (pushBackHandler) get first refusal,
+  // then minimize at the home root, else let Ionic's router pop one view.
   useEffect(() => {
     let sub: { remove: () => void } | undefined;
     (async () => {
       try {
-        sub = await CapApp.addListener("backButton", ({ canGoBack }: { canGoBack: boolean }) => {
-          if (canGoBack) window.history.back();
-          else CapApp.minimizeApp?.();
-        });
+        sub = await CapApp.addListener("backButton", () => { /* handled via ionBackButton */ });
       } catch { /* not native */ }
     })();
-    return () => { try { sub?.remove(); } catch { /* ignore */ } };
+    const onIonBack = (ev: any) => {
+      ev.detail?.register?.(90, (processNextHandler: () => void) => {
+        runBackChain(true, () => {
+          const p = window.location.pathname;
+          // Home root (or pre-auth screens): minimize instead of exiting.
+          if (p === "/supervisor/dashboard" || !p.startsWith("/supervisor/")) {
+            CapApp.minimizeApp?.();
+            return;
+          }
+          processNextHandler(); // Ionic's router pops one view
+        });
+      });
+    };
+    document.addEventListener("ionBackButton", onIonBack);
+    return () => {
+      document.removeEventListener("ionBackButton", onIonBack);
+      try { sub?.remove(); } catch { /* ignore */ }
+    };
   }, []);
 
   // Listen for reset deep links (cold start + while running) and the web URL.

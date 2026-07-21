@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useHistory } from "react-router-dom";
@@ -49,12 +50,12 @@ function dayKey(iso: string, t: any): string {
   const same = (a: Date, b: Date) => a.toDateString() === b.toDateString();
   if (same(d, today)) return t("notif.today", "Hoy");
   if (same(d, y)) return t("notif.yesterday", "Ayer");
-  return d.toLocaleDateString([], { day: "numeric", month: "long" });
+  return d.toLocaleDateString(i18n.language?.startsWith("en") ? "en-US" : "es-ES", { day: "numeric", month: "long" });
 }
 function fmtTime(iso: string, key: string, t: any): string {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
-  const time = d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  const time = d.toLocaleTimeString(i18n.language?.startsWith("en") ? "en-US" : "es-ES", { hour: "numeric", minute: "2-digit" });
   return key === t("notif.today", "Hoy") ? time : `${key}, ${time}`;
 }
 

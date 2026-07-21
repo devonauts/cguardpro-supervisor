@@ -35,11 +35,12 @@ export function hasAllowedRole(user: any): boolean {
   return roles.some((r) => (ALLOWED_ROLES as readonly string[]).includes(r));
 }
 
-/** Resolve the effective worker role (supervisor wins over guard). */
+/** Resolve the effective role for this app. Supervisors only — the guard
+ *  branch was dead code (ALLOWED_ROLES excludes guards; app:'supervisor'
+ *  rejects them server-side) and broke the WorkerRole type / the build. */
 export function resolveWorkerRole(user: any): WorkerRole | null {
   const roles = collectRoles(user);
   if (roles.includes(SUPERVISOR_ROLE)) return SUPERVISOR_ROLE;
-  if (roles.includes(GUARD_ROLE)) return GUARD_ROLE;
   return null;
 }
 

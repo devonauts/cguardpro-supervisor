@@ -49,10 +49,20 @@ export default function SupervisorRadio({ onClose }: { onClose?: () => void } = 
   // physical press and could leave the button un-red while transmitting).
   const [pressed, setPressed] = useState(false);
   const lastSpeaker = useRef<string | null>(null);
+  // Mirror `pressed` in a ref so the unmount cleanup can read the latest value
+  // without re-subscribing every press.
+  const pressedRef = useRef(false);
+  pressedRef.current = pressed;
 
   useIonViewWillEnter(() => setScreenActive(true));
   useIonViewWillLeave(() => setScreenActive(false));
   useEffect(() => { setScreenActive(true); return () => setScreenActive(false); }, [setScreenActive]);
+
+  // If the screen unmounts while the finger is still on PTT (a route change or
+  // tab switch mid-transmission), release talk so the mic never sticks open.
+  // Guarded by `pressedRef` so we only stop a transmission this screen started —
+  // never one driven by the app-level floating radio button.
+  useEffect(() => () => { if (pressedRef.current) releaseTalk(); }, [releaseTalk]);
 
   // Build a live transmission log from speaker changes (audio isn't recorded).
   useEffect(() => {

@@ -226,7 +226,7 @@ export default function CreateTask() {
         })}
       </div>
 
-      <h3 className={styles.sectionTitle}>{t("createTask.dueDate", "Fecha y hora")} <span className={styles.req}>*</span></h3>
+      <h3 className={styles.sectionTitle}>{t("createTask.dueDate", "Fecha y hora")}</h3>
       <div className={styles.rowCard}>
         <CalendarDays size={20} className={styles.rowIcon} />
         <input type="datetime-local" className={styles.rowInput} value={due} onChange={(e) => setDue(e.target.value)} />

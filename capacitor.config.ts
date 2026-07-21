@@ -15,9 +15,11 @@ const config: CapacitorConfig = {
     },
     SplashScreen: {
       // We hide it from JS once the app has painted (see src/main.tsx) for a
-      // smooth fade with no white flash — so autoHide stays off.
-      launchAutoHide: false,
-      launchShowDuration: 3000,
+      // smooth fade with no white flash. But native auto-hide stays ON as a
+      // safety net: on a screen-off/Doze launch the JS hide() can no-op and the
+      // app would otherwise hang on the logo forever.
+      launchAutoHide: true,
+      launchShowDuration: 2500,
       backgroundColor: "#0d0d0d",
       androidScaleType: "CENTER_CROP",
       showSpinner: false,

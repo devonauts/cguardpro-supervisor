@@ -37,6 +37,7 @@ import {
 import { useAsync } from "@/lib/useAsync";
 import { guardService } from "@/lib/services";
 import { setDuty } from "@/lib/dutyState";
+import { ensureLocationPermission } from "@/lib/geo";
 import { useBranding } from "@/lib/appBranding";
 import fb from "@/lib/feedback";
 import { onPush } from "@/lib/pushEvents";
@@ -438,6 +439,9 @@ export default function GuardDashboard() {
     setFlowStation(station);
     setChecklist(null);
     setFlowStep("checklist");
+    // Pre-warm location on the calm checklist screen — never inside the selfie
+    // where the dialog collides with the live camera and crashes the WebView.
+    void ensureLocationPermission();
   };
   const resetFlow = () => {
     setFlowStep("idle");

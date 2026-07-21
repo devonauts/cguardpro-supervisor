@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { pushBackHandler } from "@/lib/backButton";
 import { useTranslation } from "react-i18next";
 import {
   X,
@@ -60,6 +61,9 @@ export function VisitorPreAuthScan({
 }) {
   const { t } = useTranslation();
   const [phase, setPhase] = useState<Phase>({ kind: "scanning" });
+  // Hardware back closes this overlay (not an IonModal). When it delegates to
+  // RondaQRScanner that pushes its own handler last (LIFO wins) — fine.
+  useEffect(() => pushBackHandler(() => { onClose(); return true; }), [onClose]);
   // Guard against a double submit: html5-qrcode can fire the same QR on two
   // consecutive frames, and the manual-entry button can be double-tapped.
   const submitting = useRef(false);

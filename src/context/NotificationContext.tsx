@@ -153,6 +153,23 @@ export const NotificationProvider = ({ children }: { children: ReactNode }) => {
     };
   }, [isAuthenticated]);
 
+  // Refresh on return to foreground: pushes that arrive as system notifications
+  // while backgrounded don't fire onPush, and the socket may have dropped — so
+  // the bell/badge would stay stale until the next live event without this.
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    let sub: { remove: () => void } | undefined;
+    (async () => {
+      try {
+        const { App: CapApp } = await import("@capacitor/app");
+        sub = await CapApp.addListener("appStateChange", ({ isActive }) => {
+          if (isActive) refreshRef.current();
+        });
+      } catch { /* not native */ }
+    })();
+    return () => { try { sub?.remove(); } catch { /* ignore */ } };
+  }, [isAuthenticated]);
+
   // Optimistic: flip read=true locally, then persist. Resync on failure.
   const markRead = useCallback(async (id: string) => {
     setItems((prev) => prev.map((n) => (n.id === id ? { ...n, read: true } : n)));

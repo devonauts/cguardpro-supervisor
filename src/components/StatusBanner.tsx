@@ -41,7 +41,7 @@ export function StatusBanner() {
 
   return (
     <div
-      className="pointer-events-none fixed left-0 right-0 z-[2000] flex flex-col"
+      className="pointer-events-none fixed left-0 right-0 z-[25000] flex flex-col"
       style={{ top: 0, paddingTop: "env(safe-area-inset-top)" }}
     >
       <div ref={stripsRef} className="flex flex-col">

@@ -60,7 +60,23 @@ export default function StationInspection() {
     onResult: (text) => setTranscript((prev) => (prev ? `${prev} ${text}` : text).trim()),
   });
 
-  useEffect(() => () => { if (tickRef.current) window.clearInterval(tickRef.current); }, []);
+  // Keep the live recording state + stt handle in refs so the unmount cleanup
+  // (empty deps) can tear them down without capturing a stale closure.
+  const recordingRef = useRef(recording);
+  recordingRef.current = recording;
+  const sttRef = useRef(stt);
+  sttRef.current = stt;
+
+  // On unmount: clear the tick timer AND — critically — release the microphone
+  // and stop speech recognition if a recording is still live. Without this,
+  // navigating away mid-recording leaves the mic hot and STT listening.
+  useEffect(() => () => {
+    if (tickRef.current) window.clearInterval(tickRef.current);
+    if (recordingRef.current) {
+      try { cancelRecording(); } catch { /* ignore */ }
+      try { sttRef.current.stop(); } catch { /* ignore */ }
+    }
+  }, []);
 
   /* --------------------------------------------------------- media */
   const onPickFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {

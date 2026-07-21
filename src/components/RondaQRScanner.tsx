@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { pushBackHandler } from "@/lib/backButton";
 import { useTranslation } from "react-i18next";
 import { X, Keyboard, Loader2, CameraOff } from "lucide-react";
 
@@ -22,6 +23,11 @@ export function RondaQRScanner({
   const [manual, setManual] = useState(false);
   const [manualValue, setManualValue] = useState("");
 
+  // Android hardware back must CLOSE this full-screen overlay — it's not an
+  // IonModal, so without this the back press falls through and navigates the
+  // page underneath while the scanner stays painted on top.
+  useEffect(() => pushBackHandler(() => { onClose(); return true; }), [onClose]);
+
   useEffect(() => {
     let active = true;
     (async () => {
@@ -42,7 +48,14 @@ export function RondaQRScanner({
             /* per-frame decode failures are normal; ignore */
           }
         );
-        if (active) setStatus("scanning");
+        if (!active) {
+          // Unmounted while the camera was warming up: the cleanup's stop()
+          // already ran/failed, so release the stream here or the camera LED
+          // stays on until reload.
+          scanner.stop().then(() => scanner.clear()).catch(() => {});
+          return;
+        }
+        setStatus("scanning");
       } catch {
         if (active) {
           setStatus("error");
