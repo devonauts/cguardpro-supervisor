@@ -20,7 +20,7 @@ import { useAsync } from "@/lib/useAsync";
 import { useAuth } from "@/context/AuthContext";
 import { supervisorRoute } from "@/lib/supervisorRoute";
 import { setDuty } from "@/lib/dutyState";
-import { getCurrentPosition } from "@/lib/geo";
+import { getCurrentPosition, ensureLocationPermission } from "@/lib/geo";
 import { uploadToStorage } from "@/lib/services";
 import { fmtTime, relativeTime } from "@/lib/format";
 import { pick } from "@/lib/normalize";
@@ -112,6 +112,9 @@ export default function SupervisorClockIn() {
     setChecklist(null);
     setSubmitError(null);
     goStep("checklist");
+    // Pre-warm location on the calm checklist screen — never inside the selfie
+    // where the dialog collides with the live camera and crashes the WebView.
+    void ensureLocationPermission();
   };
 
   const submitClockIn = async (selfieResult: SelfieResult) => {
