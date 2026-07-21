@@ -503,6 +503,19 @@ ion-tab-bar {
 ion-tab-button {
   --padding-top: 4px;
   --padding-bottom: 0;
+  /* Let 5 tabs share the width evenly and never force the bar wider than the
+     screen — on ≤360px phones the labels used to overflow and clip
+     ("Dashboard"→"hboard"). Shrink the label and stop it forcing min-width. */
+  min-width: 0;
+}
+ion-tab-button ion-label {
+  font-size: 10px;
+  line-height: 1.1;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-inline: 1px;
 }
 
 /* Center RADIO control. The IonTabButton keeps the column + gold label; the
